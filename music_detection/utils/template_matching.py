@@ -2,7 +2,7 @@ from enum import Enum
 
 import cv2
 import numpy as np
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 from music_detection.utils.template import Template
 
@@ -30,7 +30,7 @@ def match(template: np.array, image: np.array) -> Tuple[float, Tuple]:
     return score, position
 
 
-def pick_template(template_list: List[Template], image: np.array) -> Enum:
+def pick_template(template_list: List[Template], image: np.array, threshold=0.7) -> Optional[Enum]:
     max_score = 0
     enum_type = 0
 
@@ -40,4 +40,6 @@ def pick_template(template_list: List[Template], image: np.array) -> Enum:
             enum_type = template.type
             max_score = score
 
+    if max_score < threshold:
+        return None
     return enum_type
