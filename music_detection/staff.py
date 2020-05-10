@@ -17,12 +17,13 @@ class Staff:
     def identify_measures(self):
         pass
 
-    def identify_clef_time(self):
+    def identify_clef(self):
         if self.key == KeyEnum.UNDEFINED:
             clef = pick_template(self.template_manager.clef, self.image)
             if clef is not None:
                 self.key = clef
 
+    def identify_time(self):
         if self.time_signature == TimeSignatureEnum.UNDEFINED:
             time = pick_template(self.template_manager.time_signature, self.image)
             if time is not None:
