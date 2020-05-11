@@ -51,6 +51,7 @@ def pick_template(template_list: List[Template], image: np.array, threshold=0.7)
             enum_type = template.type
             max_score = score
 
+    # if the score is lower than the threshold, no template was actually found
     if max_score < threshold:
         return None
     return enum_type
