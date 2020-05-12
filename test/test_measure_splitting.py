@@ -1,5 +1,4 @@
 import cv2
-import os
 import pytest
 from music_detection.staff import Staff
 
@@ -8,10 +7,10 @@ from music_detection.staff import Staff
 
 def test_bar_lines():
     file_name = "twinkle_test_11.png"
-    path=os.path.join(os.path.dirname(__file__), "measure_splitting\\pictures\\"+file_name)
+    path="../resources/test_images/"+file_name
 
     im = cv2.imread(path)
-    staff = Staff(im)
+    staff = Staff(im, None)
     staff.line_gap = 11
     staff.identify_measures()
     
