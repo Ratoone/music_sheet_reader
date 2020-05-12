@@ -133,3 +133,6 @@ dmypy.json
 
 #vscode config
 .vscode/
+
+#Test folder
+measure_splitting/
