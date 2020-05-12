@@ -1,14 +1,12 @@
-import cv2
+
 import numpy as np
+import cv2
 
 from .measure import Measure
 from .key_enum import KeyEnum
 from .time_enum import TimeSignatureEnum
 from .utils.template_manager import TemplateManager
 from .utils.template_matching import pick_template
-
-
-
 
 class Staff:
     def __init__(self, image: np.ndarray, template_manager: TemplateManager):
@@ -67,3 +65,20 @@ class Staff:
             prev_boundary = next_boundary
 
 
+    def identify_clef(self):
+        """
+        Use the template picker to find the key template that fits best
+        """
+        if self.key == KeyEnum.UNDEFINED:
+            clef = pick_template(self.template_manager.clef, self.image)
+            if clef is not None:
+                self.key = clef
+
+    def identify_time(self):
+        """
+        Use the template picker to find the time signature template that fits best
+        """
+        if self.time_signature == TimeSignatureEnum.UNDEFINED:
+            time = pick_template(self.template_manager.time_signature, self.image)
+            if time is not None:
+                self.time_signature = time
