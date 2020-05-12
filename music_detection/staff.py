@@ -1,5 +1,7 @@
 from .measure import Measure
 from .key_enum import KeyEnum
+from .time_enum import TimeSignatureEnum
+from .utils.template_manager import TemplateManager
 
 import cv2
 import numpy as np
