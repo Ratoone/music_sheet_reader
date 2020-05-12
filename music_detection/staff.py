@@ -11,6 +11,7 @@ class Staff:
     def __init__(self, image: np.ndarray, template_manager: TemplateManager):
         self.key = KeyEnum.UNDEFINED
         self.image = image
+        self.time_signature = TimeSignatureEnum.UNDEFINED
         self.template_manager = template_manager
         self.measure_list = []
         self.image = image #Actual picture of the staff
