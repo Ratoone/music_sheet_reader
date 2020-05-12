@@ -16,8 +16,8 @@ class Staff:
         '''Split the staff into different Measure objects stored in measure_list'''
         vote_threshold = int(3.25*self.line_gap) #Determined experimentally
 
-        #Preprocessing : will be probably be removed in later versions, because
-        #performed in another function
+        #TODO : put the preprocessing part in another function, so that it is performed only once
+        #for both bar and staff lines detection
         im_gray = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
         im_blur = cv2.GaussianBlur(im_gray, (3, 3), 0)
         im_adapt_thresh = cv2.adaptiveThreshold(im_blur, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
@@ -40,7 +40,7 @@ class Staff:
         lines = cv2.HoughLines(im_skel, 1, np.pi/180, vote_threshold)
         bar_lines_loc = list()
         for rho, theta in lines[:,0]:
-            if theta==0: #only vertical lines are kept
+            if theta< 3*np.pi/180: #only vertical (or almost vertical) lines are kept
                 bar_lines_loc.append(int(round(rho)))
         
         bar_lines_loc.sort() #Necessary because bar lines are found in a random order
@@ -54,8 +54,8 @@ class Staff:
                 self.measure_list.append(measure)
             else: 
                 #Otherwise it means that the previous mesure has to be repeated
-                #WARNING : for now, this algorithm does not differenciate repeating measures (: ||)
-                #and the end of a music score (||)
+                #TODO : find an efficient way to differenciate repeating measures (: ||)
+                #from the end of a music score (||) 
                 self.measure_list.append(self.measure_list[-1])
             prev_boundary = next_boundary
 
