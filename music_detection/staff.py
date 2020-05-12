@@ -1,10 +1,11 @@
+import cv2
+import numpy as np
+
 from .measure import Measure
 from .key_enum import KeyEnum
 from .time_enum import TimeSignatureEnum
 from .utils.template_manager import TemplateManager
 
-import cv2
-import numpy as np
 
 
 
@@ -12,7 +13,6 @@ import numpy as np
 class Staff:
     def __init__(self, image: np.ndarray, template_manager: TemplateManager):
         self.key = KeyEnum.UNDEFINED
-        self.image = image
         self.time_signature = TimeSignatureEnum.UNDEFINED
         self.template_manager = template_manager
         self.measure_list = []
