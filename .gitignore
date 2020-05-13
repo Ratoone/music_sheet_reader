@@ -136,3 +136,4 @@ dmypy.json
 
 #Test folder
 measure_splitting/
+music_score_detection/
