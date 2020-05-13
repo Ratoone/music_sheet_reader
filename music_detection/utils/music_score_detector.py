@@ -1,30 +1,32 @@
 import cv2
 import numpy as np 
 
-# Link to the tutorial that helped me :
-# https://www.pyimagesearch.com/2014/09/01/build-kick-ass-mobile-document-scanner-just-5-minutes/
+#Link to the tutorial that helped me :
+#https://www.pyimagesearch.com/2014/09/01/build-kick-ass-mobile-document-scanner-just-5-minutes/
 
 
-def scale_image(img:np.ndarray) -> np.ndarray:
+def scale_image(img : np.ndarray) -> np.ndarray:
     """Scale down an image for display with cv2.imshow()
        :img : image to be scaled
        :return : scaled down image
     """
-	max_height = 800
-	max_width = 1600
-	height = img.shape[0]
-	width = img.shape[1]
-	if height > max_height:
-		ratio = max_height/height
-		height = max_height
-		width = int(width*ratio)
-	if width > max_width:
-		ratio = max_width/width
-		width = max_width
-		height = int(height*ratio)
-	
-	img_resized = cv2.resize(img, (width, height))
-	return img_resized
+    max_height = 800
+    max_width = 1600
+    height = img.shape[0]
+    width = img.shape[1]
+    if height > max_height:
+        ratio = max_height/height
+        height = max_height
+        width = int(width*ratio)
+    if width > max_width:
+        ratio = max_width/width
+        width = max_width
+        height = int(height*ratio)
+
+    img_resized = cv2.resize(img, (width, height))
+    return img_resized
+
+    
 
 def find_music_score(image:np.ndarray) -> np.ndarray:
     """Locate and the music score in image, udistorts it, crops it out
@@ -78,9 +80,6 @@ def find_music_score(image:np.ndarray) -> np.ndarray:
     diff = np.diff(pts, axis = 1)
     rect[1] = pts[np.argmin(diff)] #bottom-left corner
     rect[3] = pts[np.argmax(diff)] #top-right corner
-
-    def dist(x, y):
-        return np.sqrt((x[0]-y[0])**2 + (x[1]-y[1])**2)
 
     rect = rect/RESIZE_RATIO #Corner coordinates are expressed in the unscaled image
 
