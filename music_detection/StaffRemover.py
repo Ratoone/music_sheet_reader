@@ -1,15 +1,20 @@
+from typing import Tuple, List
+
 import cv2
 import numpy as np
 
 
-def findLines(img):
+def findLines(img: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    """
+    Finds the staff lines in the image
+    :param img: original image
+    :return: a tuple consisting of the staff lines and the edge map
+    """
     # remove noise
     kernel = np.ones((3, 3), np.float32) / 9
     dst = cv2.filter2D(img, -1, kernel)
     # convert the image to gray scale if the image is bgr
     gray = cv2.cvtColor(dst, cv2.COLOR_BGR2GRAY)
-    # Otsu's thresholding
-    # ret2,th2 = cv2.threshold(gray,0,255,cv2.THRESH_BINARY+cv2.THRESH_OTSU)
     # canny_edge detection
     edges = cv2.Canny(gray, 50, 150, apertureSize=3)
     # find the lines using Hough Transform
@@ -19,39 +24,29 @@ def findLines(img):
     return linesSorted, edges
 
 
-def staffDetection(img):
-    linesSorted, _ = findLines(img)
-    # find number of all the staff lines
-    numberOfLines = int(linesSorted.shape[0] / 2)
-    # find number of staves (in twinkle case it is 3)
-    numberOfStave = int(numberOfLines / 5)
-    # find line Gap
-    lineGap = linesSorted[3, 0][0] - linesSorted[2, 0][0]
-    # make an empty matrix
-    distance = np.zeros((numberOfStave, 2))
-    # put all the half distances in the d matrix
-    distance[0][0] = linesSorted[0, 0][0] - round((linesSorted[10, 0][0] - linesSorted[9, 0][0]) / 2)
-    distance[0][1] = linesSorted[0, 0][1]
-    for i in range(numberOfStave - 1):
-        if i == (numberOfStave - 1):
-            break
-        s = int((numberOfLines * 2 / numberOfStave) * (i + 1))
-        distance[i + 1][0] = linesSorted[s - 1, 0][0] + round((linesSorted[s, 0][0] - linesSorted[s - 1, 0][0]) / 2)
-        distance[i + 1][1] = linesSorted[s - 1, 0][1]
-    return distance, lineGap
-
-
-def cropImage(distance, img):
-    numberOfStave = int(distance.shape[0])
+def cropImage(img: np.ndarray, splits: np.ndarray) -> List[np.ndarray]:
+    """
+    Splits the image using the splitting vector
+    :param img: the image to be split
+    :param splits: list containing splitting lines
+    :return: a list of the resulting image crops
+    """
+    numberOfSplits = int(splits.shape[0])
     crop_img = []
-    for i in range(numberOfStave - 1):
-        y = int(distance[i][0])
-        h = int(distance[i + 1][0] - distance[i][0])
+    for i in range(numberOfSplits - 1):
+        y = int(splits[i][0])
+        h = int(splits[i + 1][0] - splits[i][0])
         crop_img.append(img[y:y + h, :, :])
     return crop_img
 
 
-def removeStaff(edges, staffLines):
+def removeStaff(edges: np.ndarray, staffLines: np.ndarray) -> np.ndarray:
+    """
+    Removes the staff lines from the edge map and performs a closing operation afterwards
+    :param edges: the edge map image
+    :param staffLines: the staff lines that will be removed
+    :return: the edge map after removing the lines
+    """
     # staffRemoval
     for i in range(staffLines.shape[0]):
         x = int(staffLines[i, 0][0])
@@ -62,3 +57,37 @@ def removeStaff(edges, staffLines):
     # complement of the image
     imageComp = cv2.bitwise_not(closing)
     return imageComp
+
+
+def staffDetection(img: np.ndarray, removeLines: bool = True) -> Tuple[List[np.ndarray], int]:
+    """
+    Recognizes the staff lines from the image and crops each individual staff. May also remove the staff lines
+    if requested.
+    :param img: the rectified image of the music sheet
+    :param removeLines: if True, the final image will not contain the staff lines
+    :return: a list of images, each one corresponding to one staff, as well as the line gap in pixels
+    """
+    staffLines, edges = findLines(img)
+    # find number of all the staff lines
+    numberOfLines = int(staffLines.shape[0] / 2)
+    # find number of staves (in twinkle case it is 3)
+    numberOfStave = int(numberOfLines / 5)
+    # find line Gap
+    lineGap = staffLines[3, 0][0] - staffLines[2, 0][0]
+    # make an empty matrix
+    splittingLines = np.zeros((numberOfStave, 2))
+    # split the title
+    splittingLines[0][0] = staffLines[0, 0][0] - round((staffLines[10, 0][0] - staffLines[9, 0][0]) / 2)
+    splittingLines[0][1] = staffLines[0, 0][1]
+    for i in range(numberOfStave - 1):
+        if i == (numberOfStave - 1):
+            break
+        s = 10 * (i + 1)
+        splittingLines[i + 1][0] = staffLines[s - 1, 0][0] + round((staffLines[s, 0][0] - staffLines[s - 1, 0][0]) / 2)
+        splittingLines[i + 1][1] = staffLines[s - 1, 0][1]
+
+    if removeLines:
+        edges = removeStaff(edges, staffLines)
+
+    staffCrop = cropImage(edges, splittingLines)
+    return staffCrop, lineGap
