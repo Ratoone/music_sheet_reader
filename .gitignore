@@ -127,3 +127,12 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+#Linter config
+.pylintrc
+
+#vscode config
+.vscode/
+
+#Test folder
+measure_splitting/
