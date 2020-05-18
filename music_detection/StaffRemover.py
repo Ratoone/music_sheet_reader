@@ -36,7 +36,9 @@ def cropImage(img: np.ndarray, splits: np.ndarray) -> List[np.ndarray]:
     for i in range(numberOfSplits - 1):
         y = int(splits[i][0])
         h = int(splits[i + 1][0] - splits[i][0])
-        crop_img.append(img[y:y + h, :, :])
+        crop_img.append(img[y:y + h, :])
+    # add the last crop as well
+    crop_img.append(img[int(splits[-1, 0]):, :])
     return crop_img
 
 
