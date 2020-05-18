@@ -131,8 +131,9 @@ dmypy.json
 #Linter config
 .pylintrc
 
-#vscode config
+#ide config
 .vscode/
+.idea/
 
 #Test folder
 measure_splitting/
