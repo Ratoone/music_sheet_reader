@@ -28,17 +28,17 @@ class ShapeManager:
         # no line => full note
         lines = cv2.HoughLinesP(image, 1, np.pi / 180, int(line_gap * 2.5))
         if lines is None:
-            note_duration = 1
+            note_duration = 4
         else:
             # center is empty => half note
             if image[note_center_position, width // 2] == 0:
-                note_duration = 0.5
+                note_duration = 2
             else:
                 # width is no bigger than 2 line gaps (implying the existence of the little flags)
                 if width < 2 * line_gap:
-                    note_duration = 0.25
+                    note_duration = 1
                 else:
-                    note_duration = 0.125
+                    note_duration = 0.5
 
         # the default note will be the Si4 - third line, Sol clef - as it is in the center of the image
         default_note_pitch = 7 * 4 + 6
