@@ -30,21 +30,5 @@ for i,note in enumerate(notes) :
         twinkle_staff.measure_list.append(new_measure)
         new_measure = Measure()
 
-
-#MIDI file creation and configuration
-songFile = mu.MIDIFile(1)
-
-songFile.addTempo(0,0,twinkle_staff.tempo)
-numerator, denominator, clocks_amount = get_time_signature_values(twinkle_staff)
-songFile.addTimeSignature(0,0,numerator,denominator, clocks_amount)
-
-#Note writing process
-time=0
-for measure in twinkle_staff.measure_list :
-    for note in measure.note_list :
-        songFile.addNote(0,0,pitch_convert(note), time, note.duration, 127)
-        time +=note.duration
-
-#File is then saved
-with open("examples\\midi_encoding\\result.mid", "wb") as output_file:
-    songFile.writeFile(output_file)
+#Converts twinkle_staff to MIDI format
+write_MIDI_file(twinkle_staff, "examples\\midi_encoding\\result.mid")

@@ -3,6 +3,8 @@ from music_detection.note import Note
 from music_detection.time_enum import TimeSignatureEnum
 from music_detection.note_enum import NoteEnum
 
+import midiutil as mu
+
 def get_time_signature_values(staff : Staff) -> int :
     """Extract necessary values for note encoding in MIDI format \n
     input:
@@ -48,3 +50,29 @@ def pitch_convert(note : Note) -> int :
     
     MIDIValue = (octave+1)*12+note_offset
     return MIDIValue
+
+#TODO : MAYBE change the following function so that instead of a unique Staff object it takes
+#        a list of them as input
+def write_MIDI_file(staff:Staff, path:str):
+    """Converts Staff object into MIDI file and saves it \n
+    inputs :
+        -staff : Staff object to convert
+        -path : path of the resulting MIDI file (e.g. examples\\result.mdi) 
+    """
+    #MIDI file creation and configuration
+    songFile = mu.MIDIFile(1)
+
+    songFile.addTempo(0,0,staff.tempo)
+    numerator, denominator, clocks_amount = get_time_signature_values(staff)
+    songFile.addTimeSignature(0,0,numerator,denominator, clocks_amount)
+
+    #Note writing process
+    time=0
+    for measure in staff.measure_list :
+        for note in measure.note_list :
+            songFile.addNote(0,0,pitch_convert(note), time, note.duration, 127)
+            time +=note.duration
+
+    #File is then saved
+    with open(path, "wb") as output_file:
+        songFile.writeFile(output_file)
