@@ -2,11 +2,12 @@ from enum import Enum
 
 
 class NoteEnum(Enum):
-    UNDEFINED = 0
-    DO = 1
-    RE = 2
-    MI = 3
-    FA = 4
-    SOL = 5
-    LA = 6
-    SI = 7
+    UNDEFINED = -1
+    DO = 0
+    RE = 1
+    MI = 2
+    FA = 3
+    SOL = 4
+    LA = 5
+    SI = 6
+
