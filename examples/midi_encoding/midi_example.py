@@ -4,31 +4,45 @@ import sys, os
 
 sys.path.insert(0,os.getcwd())
 
-from music_detection.utils.midi_functions import *
+from music_detection.utils.midi_writer import *
 from music_detection.measure import Measure
 from music_detection.staff import Staff
 from music_detection.note import Note
 from music_detection.note_enum import NoteEnum
 from music_detection.time_enum import TimeSignatureEnum
 
-##Test Staff creation
-twinkle_staff = Staff(None, None)
+##testset creation
+twinkle_staffs = [Staff(None,None) for i in range(3)]
 octave_number = 4
-notes = [NoteEnum.DO, NoteEnum.DO, NoteEnum.SOL, NoteEnum.SOL, NoteEnum.LA, NoteEnum.LA, NoteEnum.SOL, NoteEnum.FA, NoteEnum.FA,
-        NoteEnum.MI, NoteEnum.MI, NoteEnum.RE, NoteEnum.RE, NoteEnum.DO]
-duration = [1,1,1,1,1,1,2,1,1,1,1,1,1,2]
+notes_twinkle = [[NoteEnum.DO, NoteEnum.DO, NoteEnum.SOL, NoteEnum.SOL, NoteEnum.LA, NoteEnum.LA, NoteEnum.SOL, NoteEnum.FA, NoteEnum.FA,
+        NoteEnum.MI, NoteEnum.MI, NoteEnum.RE, NoteEnum.RE, NoteEnum.DO],[ NoteEnum.SOL, NoteEnum.SOL, NoteEnum.FA, NoteEnum.FA,
+        NoteEnum.MI, NoteEnum.MI, NoteEnum.RE,NoteEnum.SOL, NoteEnum.SOL, NoteEnum.FA, NoteEnum.FA,NoteEnum.MI, NoteEnum.MI, NoteEnum.RE],
+        [NoteEnum.DO, NoteEnum.DO, NoteEnum.SOL, NoteEnum.SOL, NoteEnum.LA, NoteEnum.LA, NoteEnum.SOL, NoteEnum.FA, NoteEnum.FA,
+        NoteEnum.MI, NoteEnum.MI, NoteEnum.RE, NoteEnum.RE, NoteEnum.DO]]
+durations_twinkle = [[1,1,1,1,1,1,2,1,1,1,1,1,1,2],[1,1,1,1,1,1,2,1,1,1,1,1,1,2],[1,1,1,1,1,1,2,1,1,1,1,1,1,2]]
 
-twinkle_staff.time_signature = TimeSignatureEnum.COMMON
-bar_length= 0
-new_measure = Measure()
-for i,note in enumerate(notes) : 
-    new_note = Note(note, octave_number, duration[i])
-    new_measure.note_list.append(new_note)
-    bar_length += duration[i]
-    if bar_length==4 :
-        bar_length = 0
-        twinkle_staff.measure_list.append(new_measure)
-        new_measure = Measure()
+for k,staff in enumerate(twinkle_staffs) :
+    staff.time_signature = TimeSignatureEnum.COMMON
+    bar_length= 0
+    new_measure = Measure()
+    notes =notes_twinkle[k]
+    duration = durations_twinkle[k]
+    for i,note in enumerate(notes) : 
+        new_note = Note(note, octave_number, duration[i])
+        new_measure.note_list.append(new_note)
+        bar_length += duration[i]
+        if bar_length==4 :
+            bar_length = 0
+            staff.measure_list.append(new_measure)
+            new_measure = Measure()
 
-#Converts twinkle_staff to MIDI format
-write_MIDI_file(twinkle_staff, "examples\\midi_encoding\\result.mid")
+#MidiWriter Object creation end initialization
+mw = MIDIWriter(1)
+for staff in twinkle_staffs :
+    mw.addStaff(0,staff)
+
+#Writing to file
+mw.writeToFile("result_twinkle.mid")
+
+
+
