@@ -15,4 +15,4 @@ def test_staff_appen():
     for i in range(4) :
         staff = Staff(None, None)
         mw.addStaff(1,staff)
-    assert (len(mw.track_list[1])==4 and type(mw.track_list[1].staff_list[0])== Staff)
+    assert (len(mw.track_list[1].staff_list)==4 and type(mw.track_list[1].staff_list[0])== Staff)
