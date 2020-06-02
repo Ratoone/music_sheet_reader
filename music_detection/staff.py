@@ -16,7 +16,8 @@ class Staff:
         self.measure_list = []
         self.image = image #Actual picture of the staff
         self.line_gap = 0 #Added it just to signify that i need it from a previous processing
-
+        self.tempo = 120 #overall tempo of the music score in bpm, default MIDI value is 120 bpm  
+    
     def identify_measures(self) -> None:
         '''Split the staff into different Measure objects stored in measure_list'''
         vote_threshold = int(3.25*self.line_gap) #Determined experimentally

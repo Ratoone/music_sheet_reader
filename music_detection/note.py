@@ -2,8 +2,8 @@ from .note_enum import NoteEnum
 
 
 class Note:
-    def __init__(self):
-        self.name = NoteEnum.UNDEFINED
-        self.octave = 0
-        self.duration = 0
+    def __init__(self, name = NoteEnum.UNDEFINED, octave=0, duration=0):
+        self.name = name 
+        self.octave = octave 
+        self.duration = duration
 
