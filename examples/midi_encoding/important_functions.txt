@@ -1,0 +1,40 @@
+addTimeSignature(track,time,numerator,denominator,clocks_per_tick,notes_per_quarter=8)
+    -track : track number, 0 in our case
+    -time  : time of the event (always 0)
+    -numerator and denominator : numerator and denominator of the time signature
+    -clocks_per_tick  : the standard is 24 clocks per quarter note.
+        Examples : 4/4 -> 4 quarter notes per bar -> clocks_per_tick = 4*24 = 96
+                  3/8 -> 3 eigth notes per bar -> clocks_per_tick = (3/2)*24 = 36
+
+addTempo(track,time,tempo)
+    -track : track number, 0 in our case
+    -time  : time of the event (always 0)
+    -tempo : tempo value in bpm (indicated at the beginning at the music score)
+
+addNote(track,channel,pitch,time,duration,volume,annotation=None)
+    -track : track number, 0 in our case
+    -channel  : channel number , 0 in our case (channel is a set of tracks, e.g. a channel = one instrument)
+    -pitch  : pitch of the note, has to be converted from music notation to MIDI notation
+            the formula is as follow : MIDI_number = (number+1)*12+letter_offset
+            where letter_offset takes the following values  :   letter_offset   |   offset
+                                                                ----------------+----------
+                                                                        DO      |   0
+                                                                        RE      |   2
+                                                                        MI      |   4
+                                                                        FA      |   5
+                                                                        SO      |   7
+                                                                        LA      |   9
+                                                                        SI      |   11
+    -time  : float, time in beats at which the note sounds
+    -duration : float, duration of the note (quarter note : 1 beat, half note : 2 beats, full note : 4 beats)
+    -volume : integer [0-127], volume of the note (always 127 for us in practice)
+    -annotation : arbitratry data attached to the note (probably won't be used)
+
+addKeySignature(track,time,accidentals,accidental_type,mode,insertion_order=0)
+    -track : track number, 0 in our case
+    -time  : time at which the accidental occurs
+    -accidentals : number of accidentals in the key signature
+    -accidental_type : type of accidental (constants can be imported via "from midiutil.MidiFile import*" command)
+    -mode  : mode of the scale ? (can be determined via constants)
+    -insertion_order : not explained in the doc, better not mess with it 
+    

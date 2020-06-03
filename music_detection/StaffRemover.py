@@ -59,7 +59,6 @@ def removeStaff(edges: np.ndarray, staffLines: np.ndarray) -> np.ndarray:
     return closing
 
 
-
 def staffDetection(img: np.ndarray, removeLines: bool = True) -> Tuple[List[np.ndarray], int]:
     """
     Recognizes the staff lines from the image and crops each individual staff. May also remove the staff lines

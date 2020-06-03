@@ -135,5 +135,7 @@ dmypy.json
 .vscode/
 .idea/
 
-#Test folder
+#Test folders
 measure_splitting/
+music_score_detection/
+midi_tests/
