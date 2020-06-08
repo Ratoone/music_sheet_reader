@@ -139,3 +139,4 @@ dmypy.json
 measure_splitting/
 music_score_detection/
 midi_tests/
+staff_segmentation/

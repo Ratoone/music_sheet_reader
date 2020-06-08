@@ -2,7 +2,7 @@ import os
 
 import cv2
 
-from music_detection.StaffRemover import staffDetection
+from music_detection.utils.StaffRemover import staffDetection
 
 
 def test_count_staves_successfully():
