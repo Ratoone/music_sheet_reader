@@ -10,7 +10,7 @@ def test_bar_lines():
     path="../resources/test_images/"+file_name
 
     im = cv2.imread(path)
-    staff = Staff(im, None)
+    staff = Staff(im)
     staff.line_gap = 11
     staff.identify_measures()
     

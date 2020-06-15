@@ -8,18 +8,18 @@ from .time_enum import TimeSignatureEnum
 from .utils.template_manager import TemplateManager
 from .utils.template_matching import pick_template
 
+
 class Staff:
-    def __init__(self, image: np.ndarray, template_manager: TemplateManager):
+    def __init__(self, image: np.ndarray):
         self.key = KeyEnum.UNDEFINED
         self.time_signature = TimeSignatureEnum.UNDEFINED
-        self.template_manager = template_manager
         self.measure_list = []
         self.image = image #Actual picture of the staff
         self.line_gap = 0 #Added it just to signify that i need it from a previous processing
         self.tempo = 120 #overall tempo of the music score in bpm, default MIDI value is 120 bpm  
     
     def identify_measures(self) -> None:
-        '''Split the staff into different Measure objects stored in measure_list'''
+        """Split the staff into different Measure objects stored in measure_list"""
         vote_threshold = int(3.25*self.line_gap) #Determined experimentally
 
         #TODO : put the preprocessing part in another function, so that it is performed only once
@@ -64,22 +64,3 @@ class Staff:
                 #from the end of a music score (||) 
                 self.measure_list.append(self.measure_list[-1])
             prev_boundary = next_boundary
-
-
-    def identify_clef(self):
-        """
-        Use the template picker to find the key template that fits best
-        """
-        if self.key == KeyEnum.UNDEFINED:
-            clef = pick_template(self.template_manager.clef, self.image)
-            if clef is not None:
-                self.key = clef
-
-    def identify_time(self):
-        """
-        Use the template picker to find the time signature template that fits best
-        """
-        if self.time_signature == TimeSignatureEnum.UNDEFINED:
-            time = pick_template(self.template_manager.time_signature, self.image)
-            if time is not None:
-                self.time_signature = time

@@ -1,15 +1,43 @@
+from typing import Tuple
+
 import cv2
 import numpy as np
 
 from music_detection.key_enum import KeyEnum
 from music_detection.note import Note
+from music_detection.utils.template_manager import TemplateManager
+from music_detection.utils.template_matching import pick_template
+
+# TODO: open it from the configuration file
+template_manager = TemplateManager("../../resources/templates")
 
 
 class ShapeManager:
     @staticmethod
-    def identify_shape(image: np.ndarray, key: KeyEnum, line_gap: int):
-        # TODO: implement template matching to identify what kind of element is the current one
-        pass
+    def identify_shape(image: np.ndarray, key: KeyEnum, line_gap: int) -> Tuple[str, object]:
+        """
+        Identify the current shape using various methods: template matching, hough transform, etc.
+        :param image: the element to be identified
+        :param key: the key of the staff. Useful for identifying the right pitch of the note
+        :param line_gap: the line gap in pixels between two staff lines. Useful for notes
+        :return: a string denoting the type of element found and an object relevant to that type.
+        For instance, a note will return a Note, a clef will return an Enum, etc.
+        """
+        clef = pick_template(template_manager.clef, image)
+        if clef is not None:
+            return "Clef", clef
+
+        time = pick_template(template_manager.time_signature, image)
+        if time is not None:
+            return "Time", time
+
+        note_heads = cv2.HoughCircles(image, cv2.HOUGH_GRADIENT, 1.2, line_gap, minRadius=0.8*line_gap, maxRadius=1.2*line_gap)
+        if note_heads is not None:
+            # TODO: assuming single note, fix for 2 eights
+            return "Note", ShapeManager.handle_note(image, key, line_gap, int(note_heads[0][2]))
+
+        return "Invalid", None
+
 
     @staticmethod
     def handle_note(image: np.ndarray, key: KeyEnum, line_gap: int, note_center_position: int) -> Note:
@@ -23,7 +51,6 @@ class ShapeManager:
         """
         # TODO: include the possibility of being in a different scale - assuming Do Major
         # TODO: consider the 1/16th note as well
-        note_duration = 0
         height, width = image.shape
         # no line => full note
         lines = cv2.HoughLinesP(image, 1, np.pi / 180, int(line_gap * 2.5))
