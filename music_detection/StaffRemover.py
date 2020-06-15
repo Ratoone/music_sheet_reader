@@ -56,9 +56,7 @@ def removeStaff(edges: np.ndarray, staffLines: np.ndarray) -> np.ndarray:
     # do closing operation
     kernel = np.ones((5, 5), np.uint8)
     closing = cv2.morphologyEx(edges, cv2.MORPH_CLOSE, kernel)
-    # complement of the image
-    imageComp = cv2.bitwise_not(closing)
-    return imageComp
+    return closing
 
 
 def staffDetection(img: np.ndarray, removeLines: bool = True) -> Tuple[List[np.ndarray], int]:
