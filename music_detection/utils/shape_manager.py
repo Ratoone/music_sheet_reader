@@ -49,7 +49,7 @@ class ShapeManager:
             note_pitch -= 12
         if key == KeyEnum.DO:
             note_pitch -= 6
-        return Note(note_pitch, note_duration)
+        return Note.from_pitch_duration(note_pitch, note_duration)
 
 
 if __name__ == '__main__':
