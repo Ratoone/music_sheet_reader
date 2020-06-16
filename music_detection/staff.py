@@ -15,56 +15,41 @@ class Staff:
         self.template_manager = template_manager
         self.measure_list = []
         self.image = image #Actual picture of the staff
-        self.line_gap = 0 #Added it just to signify that i need it from a previous processing
         self.tempo = 120 #overall tempo of the music score in bpm, default MIDI value is 120 bpm  
-    
-    def identify_measures(self) -> None:
-        '''Split the staff into different Measure objects stored in measure_list'''
-        vote_threshold = int(3.25*self.line_gap) #Determined experimentally
 
-        #TODO : put the preprocessing part in another function, so that it is performed only once
-        #for both bar and staff lines detection
-        im_gray = cv2.cvtColor(self.image, cv2.COLOR_BGR2GRAY)
-        im_blur = cv2.GaussianBlur(im_gray, (3, 3), 0)
-        im_adapt_thresh = cv2.adaptiveThreshold(im_blur, 255, cv2.ADAPTIVE_THRESH_MEAN_C,
-                            cv2.THRESH_BINARY_INV, 11, 2)
-        #Closing operation
-        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
-        im_morph = cv2.morphologyEx(im_adapt_thresh, cv2.MORPH_CLOSE, kernel)
+    def segment_and_divide_staff(self, staff_bin_img:np.ndarray) -> None:
+        """
+        Extracts the different elements in the staff image, and splits it into several measures
+         :param staff_bin_img: binary image of the staff, where staff lines have been removed.
+        The notes, accidentals, etc... are expected to be in white.
+        """
+        res_array=cv2.connectedComponentsWithStats(staff_bin_img, connectivity=8)
+        stats = res_array[2]
+        stats=stats[stats[:,0].argsort()]
+        bar_lines_index=self.__extract_bar_lines_info(stats)
 
-        #Skeletonization
-        im_skel = np.zeros(im_morph.shape, np.uint8)
-        element = cv2.getStructuringElement(cv2.MORPH_CROSS, (3, 3))
-        while cv2.countNonZero(im_morph) != 0:
-            im_open = cv2.morphologyEx(im_morph, cv2.MORPH_OPEN, element)
-            temp = cv2.subtract(im_morph, im_open)
-            eroded = cv2.erode(im_morph, element)
-            im_skel = cv2.bitwise_or(im_skel, temp)
-            im_morph = eroded.copy()
+        xmid_prec=0
+        prec_index = 0
+        for index in bar_lines_index :
+            bar_line_info = stats[index]
+            xmid = int(bar_line_info[0]+bar_line_info[2]/2)
+            elements_info = stats[prec_index:index,:]
+            elements_info[:,0] -= xmid_prec
+            measure=Measure(self.image[:,xmid_prec:xmid+1],elements_info )
+            self.measure_list.append(measure)
+            xmid_prec = xmid
+            prec_index=index+1
 
-        #Extraction of bar lines'x-coordinates
-        lines = cv2.HoughLines(im_skel, 1, np.pi/180, vote_threshold)
-        bar_lines_loc = list()
-        for rho, theta in lines[:,0]:
-            if theta< 3*np.pi/180: #only vertical (or almost vertical) lines are kept
-                bar_lines_loc.append(int(round(rho)))
-        
-        bar_lines_loc.sort() #Necessary because bar lines are found in a random order
-        prev_boundary = 0
-        for next_boundary in bar_lines_loc :
-            
-            #If the 2 lines are far enough from each other, the measure in-between is simply
-            #added to the list
-            if next_boundary-prev_boundary > 2*self.line_gap: 
-                measure = Measure(self.image[:, prev_boundary+1:next_boundary])#Measure is cropped
-                self.measure_list.append(measure)
-            else: 
-                #Otherwise it means that the previous mesure has to be repeated
-                #TODO : find an efficient way to differenciate repeating measures (: ||)
-                #from the end of a music score (||) 
-                self.measure_list.append(self.measure_list[-1])
-            prev_boundary = next_boundary
-
+    def __extract_bar_lines_info(self, stats:np.ndarray) -> np.ndarray :
+        """
+        Finds the bar lines in a list of element information
+         :param stats: np.ndarray, list containing the element information, in the following order : 
+        [x_upper_left_corner, y_upper_left_corner, width, height,_]
+         :return: np.ndarray, contains the indexes of the bar lines information in stats
+        """
+        ratio = stats[:,3]/stats[:,2]
+        bar_lines_index = np.where(ratio >8.0)[0]
+        return bar_lines_index
 
     def identify_clef(self):
         """
