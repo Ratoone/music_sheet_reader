@@ -2,7 +2,7 @@ from typing import Tuple, List
 from enum import Enum
 import cv2
 import numpy as np
-from music_detection.utils.preprocessing_manager import PreprocessingManager
+from music_detection.utils.preprocessing_functions import *
 
 def findLines(edges: np.ndarray) -> np.ndarray:
     """
@@ -68,9 +68,8 @@ def staffDetection(img: np.ndarray, removeLines: bool = True) -> Tuple[List[np.n
     :param removeLines: if True, the final image will not contain the staff lines
     :return: a list of staff images, a list of binarized staff images where staff lines have been removed, and the line gap in pixels
     """
-    p_m = PreprocessingManager(img)
-    edge_map = p_m.generate_edge_map()
-    im_morph = p_m.generate_thresholded_image()
+    edge_map =generate_edge_map(img)
+    im_morph = generate_thresholded_image(img)
 
     staffLines = findLines(edge_map)
     # find number of all the staff lines
