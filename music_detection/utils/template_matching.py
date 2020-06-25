@@ -6,6 +6,11 @@ from typing import List, Tuple, Optional
 
 from music_detection.utils.template import Template
 
+# TODO: move this to some configuration file
+MIN_SCALE = 0.5
+MAX_SCALE = 1.5
+SCALE_INCREMENT = 0.05
+
 
 def match(template: np.array, image: np.array) -> Tuple[float, Tuple]:
     """
@@ -18,7 +23,7 @@ def match(template: np.array, image: np.array) -> Tuple[float, Tuple]:
     found = None
 
     # scale the template at multiple values
-    for scale in np.linspace(0.5, 1.5, 20):
+    for scale in np.linspace(MIN_SCALE, MAX_SCALE, int((MAX_SCALE - MIN_SCALE) / SCALE_INCREMENT)):
         resized_template = cv2.resize(template, None, fx=scale, fy=scale, interpolation=cv2.INTER_CUBIC)
         if resized_template.shape[0] > image.shape[0] or resized_template.shape[1] > image.shape[1]:
             break
