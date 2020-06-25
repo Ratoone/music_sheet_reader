@@ -12,7 +12,7 @@ from music_detection.utils.template_matching import pick_template
 template_manager = TemplateManager("../../resources/templates")
 
 
-class ShapeManager:
+class ShapeHandler:
     @staticmethod
     def identify_shape(image: np.ndarray, key: KeyEnum, line_gap: int) -> Tuple[str, object]:
         """
@@ -34,7 +34,7 @@ class ShapeManager:
         note_heads = cv2.HoughCircles(image, cv2.HOUGH_GRADIENT, 1.2, line_gap, minRadius=0.8*line_gap, maxRadius=1.2*line_gap)
         if note_heads is not None:
             # TODO: assuming single note, fix for 2 eights
-            return "Note", ShapeManager.handle_note(image, key, line_gap, int(note_heads[0][2]))
+            return "Note", ShapeHandler.handle_note(image, key, line_gap, int(note_heads[0][2]))
 
         return "Invalid", None
 
@@ -84,4 +84,4 @@ if __name__ == '__main__':
     im_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     im_blur = cv2.GaussianBlur(im_gray, (3, 3), 0)
     _, im_adapt_thresh = cv2.threshold(im_blur, 127, 255, cv2.THRESH_BINARY_INV)
-    ShapeManager.handle_note(im_adapt_thresh, KeyEnum.UNDEFINED, 12, 3, 3)
+    ShapeHandler.handle_note(im_adapt_thresh, KeyEnum.UNDEFINED, 12, 3, 3)
