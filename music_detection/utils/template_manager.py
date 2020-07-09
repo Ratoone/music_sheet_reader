@@ -16,6 +16,11 @@ class TemplateManager:
         self.time_signature = []
         self.__build_clef_template()
         self.__build_time_template()
+        self.rests = []
+        self.accidentals = []
+        self.__rests_template()
+        self.__accidentals_template()
+
 
     def __build_clef_template(self):
         """
@@ -44,3 +49,31 @@ class TemplateManager:
             else:
                 time_type = TimeSignatureEnum((int(name[0]), int(name[1])))
             self.time_signature.append(Template(time, time_type))
+
+    def __build_rests_template(self):
+        for rests in glob.glob(os.path.join(self.path, "rests/*")):
+            if "half_rest_1" in rests:
+                rests_type = RestsEnum.HF
+            else:
+                if "whole_rest" in rests:
+                    rests_type = RestsEnum.WR
+                else:
+                    if "quarter_rest" in rests:
+                        rests_type = RestsEnum.QR
+                    else:
+                        rests_type = RestsEnum.ER
+            self.clef.append(Template(rests, rests_type))
+
+    def __build_accidentals_template(self):
+        for accidentals in glob.glob(os.path.join(self.path, "accidentals/*")):
+            if "flat-line" in accidentals:
+                accidentals_type = AccidentalsEnum.FL
+            else:
+                if "flat-space" in accidentals:
+                    accidentals_type = AccidentalsEn.FS
+                else:
+                    if "sharp-line" in accidentals:
+                        accidentals_type = AccidentalsEnum.SL
+                    else:
+                        accidentals_type = AccidentalsEnum.SS
+            self.clef.append(Template(rests, rests_type))
