@@ -10,12 +10,14 @@ from .utils.template_matching import pick_template
 
 
 class Staff:
-    def __init__(self, image: np.ndarray):
+    def __init__(self, image: np.ndarray, line_gap):
         self.key = KeyEnum.UNDEFINED
         self.time_signature = TimeSignatureEnum.UNDEFINED
         self.measure_list = []
+        self.line_gap = line_gap
         self.image = image #Actual picture of the staff
         self.tempo = 120 #overall tempo of the music score in bpm, default MIDI value is 120 bpm
+        self.segment_and_divide_staff(self.image)
 
     def segment_and_divide_staff(self, staff_bin_img:np.ndarray) -> None:
         """
@@ -39,6 +41,11 @@ class Staff:
             self.measure_list.append(measure)
             xmid_prec = xmid
             prec_index=index+1
+
+            if self.key == KeyEnum.UNDEFINED:
+                self.key = measure.key
+            if self.time_signature == TimeSignatureEnum.UNDEFINED:
+                self.time_signature = measure.time_signature
 
     def __extract_bar_lines_info(self, stats:np.ndarray) -> np.ndarray :
         """

@@ -1,4 +1,3 @@
-
 import pytest
 
 from music_detection.staff import Staff
@@ -13,6 +12,6 @@ def test_track_creation():
 def test_staff_appen():
     mw = MIDIWriter(3)
     for i in range(4) :
-        staff = Staff(None)
+        staff = Staff(None,0)
         mw.addStaff(1,staff)
     assert (len(mw.track_list[1].staff_list)==4 and type(mw.track_list[1].staff_list[0])== Staff)
