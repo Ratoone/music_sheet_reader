@@ -37,7 +37,7 @@ class Staff:
             xmid = int(bar_line_info[0]+bar_line_info[2]/2)
             elements_info = stats[prec_index:index,:]
             elements_info[:,0] -= xmid_prec
-            measure=Measure(self.image[:,xmid_prec:xmid+1],elements_info )
+            measure = Measure(self.image[:, xmid_prec:xmid+1], elements_info, self.line_gap)
             self.measure_list.append(measure)
             xmid_prec = xmid
             prec_index=index+1

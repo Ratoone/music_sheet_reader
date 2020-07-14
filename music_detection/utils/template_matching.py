@@ -35,11 +35,13 @@ def match(template: np.array, image: np.array) -> Tuple[float, Tuple]:
         if found is None or correlation > found[0]:
             found = (correlation, max_position, scale)
 
+    if not found:
+        return 0, (0, 0)
     (correlation, position, scale) = found
     return correlation, position
 
 
-def pick_template(template_list: List[Template], image: np.array, threshold=0.7) -> Optional[Enum]:
+def pick_template(template_list: List[Template], image: np.array, threshold=0.6) -> Optional[Enum]:
     """
     Pick the best matching template from the list.
     :param template_list: the list of templates to pick from
