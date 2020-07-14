@@ -12,9 +12,14 @@ if __name__ == "__main__":
     # music_score = find_music_score(image)
     _, staves_binary, line_gap = staffDetection(image, True)
     midi_writer = MIDIWriter(1)
+    previous_staff = None
 
     for staff_image in staves_binary:
         staff = Staff(staff_image, line_gap)
+        if previous_staff is not None and staff.key == previous_staff.key:
+            staff.time_signature = previous_staff.time_signature
+
+        previous_staff = staff
         midi_writer.addStaff(0, staff)
 
     midi_writer.writeToFile("output.mid")

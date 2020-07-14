@@ -7,7 +7,7 @@ from typing import List, Tuple, Optional
 from music_detection.utils.template import Template
 
 # TODO: move this to some configuration file
-MIN_SCALE = 0.5
+MIN_SCALE = 0.3
 MAX_SCALE = 1.5
 SCALE_INCREMENT = 0.05
 

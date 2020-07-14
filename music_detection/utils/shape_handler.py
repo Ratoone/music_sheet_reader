@@ -1,3 +1,4 @@
+import os
 from typing import Tuple
 
 import cv2
@@ -9,7 +10,8 @@ from music_detection.utils.template_manager import TemplateManager
 from music_detection.utils.template_matching import pick_template
 
 # TODO: open it from the configuration file
-template_manager = TemplateManager("../../resources/templates")
+path = os.path.dirname(os.path.abspath(__file__))
+template_manager = TemplateManager(os.path.join(path, "../../resources/templates"))
 
 
 class ShapeHandler:
@@ -25,18 +27,18 @@ class ShapeHandler:
         """
         clef = pick_template(template_manager.clef, image)
         if clef is not None:
-            return "Clef", clef
+            return "clef", clef
 
         time = pick_template(template_manager.time_signature, image)
         if time is not None:
-            return "Time", time
+            return "time", time
 
         note_heads = cv2.HoughCircles(image, cv2.HOUGH_GRADIENT, 1.2, line_gap, minRadius=int(0.8*line_gap), maxRadius=int(1.2*line_gap))
         if note_heads is not None:
             # TODO: assuming single note, fix for 2 eights
-            return "Note", ShapeHandler.handle_note(image, key, line_gap, int(note_heads[0][2]))
+            return "note", ShapeHandler.handle_note(image, key, line_gap, int(note_heads[0][2]))
 
-        return "Invalid", None
+        return "invalid", None
 
     @staticmethod
     def handle_note(image: np.ndarray, key: KeyEnum, line_gap: int, note_center_position: int) -> Note:

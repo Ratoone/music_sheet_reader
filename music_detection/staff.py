@@ -31,7 +31,7 @@ class Staff:
         bar_lines_index=self.__extract_bar_lines_info(stats)
 
         xmid_prec=0
-        prec_index = 0
+        prec_index = 1
         for index in bar_lines_index :
             bar_line_info = stats[index]
             xmid = int(bar_line_info[0]+bar_line_info[2]/2)
