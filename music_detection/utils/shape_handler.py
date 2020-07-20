@@ -14,6 +14,10 @@ path = os.path.dirname(os.path.abspath(__file__))
 template_manager = TemplateManager(os.path.join(path, "../../resources/templates"))
 
 
+def get_adjusted_line_gap(line_gap: int) -> int:
+    return int(line_gap * 0.8)
+
+
 class ShapeHandler:
     @staticmethod
     def identify_shape(image: np.ndarray, key: KeyEnum, line_gap: int) -> Tuple[str, object]:
@@ -33,15 +37,16 @@ class ShapeHandler:
         if time is not None:
             return "time", time
 
-        note_heads = cv2.HoughCircles(image, cv2.HOUGH_GRADIENT, 1.2, line_gap, minRadius=int(0.8*line_gap), maxRadius=int(1.2*line_gap))
+        line_empty_gap = get_adjusted_line_gap(line_gap)
+        note_heads = cv2.HoughCircles(image, cv2.HOUGH_GRADIENT, 1.2, line_empty_gap, minRadius=int(0.8*line_empty_gap), maxRadius=int(1.4*line_empty_gap), param1=50, param2=5)
         if note_heads is not None:
             # TODO: assuming single note, fix for 2 eights
-            return "note", ShapeHandler.handle_note(image, key, line_gap, int(note_heads[0][2]))
+            return "note", ShapeHandler.handle_note(image, key, line_gap, int(note_heads[0][0][0]), int(note_heads[0][0][1]))
 
         return "invalid", None
 
     @staticmethod
-    def handle_note(image: np.ndarray, key: KeyEnum, line_gap: int, note_center_position: int) -> Note:
+    def handle_note(image: np.ndarray, key: KeyEnum, line_gap: int, note_center_h: int, note_center_v: int) -> Note:
         """
         If the identified object is a note, find its pitch by checking the vertical position in the staff
         :param note_center_position: the position of the center of the note
@@ -60,10 +65,10 @@ class ShapeHandler:
         else:
             # center is empty (i.e. average around center is black) => half note
             if np.average(image[
-                          note_center_position - line_gap//4:
-                          note_center_position + line_gap//4,
-                          width // 2 - line_gap//4:
-                          width // 2 + line_gap//4]) < 125:
+                          note_center_v - line_gap//2:
+                          note_center_v + line_gap//2,
+                          note_center_h - line_gap//2:
+                          note_center_h + line_gap//2]) < 0.75 * 255:
                 note_duration = 2
             else:
                 # width is no bigger than 2 line gaps (implying the existence of the little flags)
@@ -75,7 +80,7 @@ class ShapeHandler:
         # the default note will be the Si4 - third line, Sol clef - as it is in the center of the image
         default_note_pitch = 7 * 4 + 6
         # count the increments of half line gap between the note and the third line
-        note_pitch = default_note_pitch + (height//2 - note_center_position) / (line_gap // 2)
+        note_pitch = default_note_pitch + int((height - 2 * note_center_v) / line_gap)
         # adapt the note to the key
         if key == KeyEnum.FA:
             note_pitch -= 12

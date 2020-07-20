@@ -1,6 +1,7 @@
 import cv2
 import logging
 
+from music_detection.key_enum import KeyEnum
 from music_detection.staff import Staff
 from music_detection.utils.StaffRemover import staffDetection
 from music_detection.utils.midi_writer import MIDIWriter
@@ -16,7 +17,7 @@ if __name__ == "__main__":
 
     for staff_image in staves_binary:
         staff = Staff(staff_image, line_gap)
-        if previous_staff is not None and staff.key == previous_staff.key:
+        if previous_staff is not None and staff.key in [KeyEnum.UNDEFINED, previous_staff.key]:
             staff.time_signature = previous_staff.time_signature
 
         previous_staff = staff
