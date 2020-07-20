@@ -87,11 +87,3 @@ class ShapeHandler:
         if key == KeyEnum.DO:
             note_pitch -= 6
         return Note.from_pitch_duration(note_pitch, note_duration)
-
-
-if __name__ == '__main__':
-    image = cv2.imread("../../resources/test_images/sol_quarter.png")
-    im_gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
-    im_blur = cv2.GaussianBlur(im_gray, (3, 3), 0)
-    _, im_adapt_thresh = cv2.threshold(im_blur, 127, 255, cv2.THRESH_BINARY_INV)
-    ShapeHandler.handle_note(im_adapt_thresh, KeyEnum.UNDEFINED, 12, 3)
