@@ -93,4 +93,4 @@ def staffDetection(img: np.ndarray, removeLines: bool = True) -> Tuple[List[np.n
     staff_crop = cropImage(img, splittingLines)
     staff_bin_crop = cropImage(lines_removed, splittingLines)
 
-    return staff_crop, staff_bin_crop, lineGap
+    return staff_crop, staff_bin_crop, int(lineGap)

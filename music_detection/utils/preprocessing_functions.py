@@ -2,8 +2,6 @@ import cv2
 import numpy as np
 
 
-
-
 def generate_edge_map(image:np.ndarray, binary_inv:bool=True) -> np.ndarray :
     """
     Perform an edge detection using Canny algorithm on PreprocessingManager.image \n
@@ -20,6 +18,7 @@ def generate_edge_map(image:np.ndarray, binary_inv:bool=True) -> np.ndarray :
         edges = 255-edges
     
     return edges
+
 
 def generate_thresholded_image(image:np.ndarray, binary_inv:bool=True) -> np.ndarray :
     """
@@ -42,8 +41,3 @@ def generate_thresholded_image(image:np.ndarray, binary_inv:bool=True) -> np.nda
         im_morph=255-im_morph
     
     return im_morph
-
-
-
-
-        
