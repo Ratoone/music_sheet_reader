@@ -32,7 +32,8 @@ def cropImage(img: np.ndarray, splits: np.ndarray) -> List[np.ndarray]:
         y = int(splits[i][0])
         h = int(splits[i + 1][0] - splits[i][0])
         crop_img.append(img[y:y + h, :])
-    # add the last crop as well
+
+    # add the last crop as well - make sure it has the same size as the rest
     last_crop = img[int(splits[-1, 0]):, :]
     if last_crop.shape[0] < h:
         background_color = last_crop[-1, -1]
