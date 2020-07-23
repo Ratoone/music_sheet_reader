@@ -2,6 +2,8 @@ from enum import Enum
 
 import cv2
 
+from music_detection.utils.preprocessing_functions import generate_thresholded_image
+
 
 class Template:
     """
@@ -9,5 +11,5 @@ class Template:
     with the enum type.
     """
     def __init__(self, path: str, enum_type: Enum):
-        self.template = cv2.imread(path)
+        self.template = generate_thresholded_image(cv2.imread(path), True)
         self.type = enum_type

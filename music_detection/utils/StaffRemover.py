@@ -27,12 +27,21 @@ def cropImage(img: np.ndarray, splits: np.ndarray) -> List[np.ndarray]:
     """
     numberOfSplits = int(splits.shape[0])
     crop_img = []
+    h = 0
     for i in range(numberOfSplits - 1):
         y = int(splits[i][0])
         h = int(splits[i + 1][0] - splits[i][0])
         crop_img.append(img[y:y + h, :])
-    # add the last crop as well
-    crop_img.append(img[int(splits[-1, 0]):, :])
+
+    # add the last crop as well - make sure it has the same size as the rest
+    last_crop = img[int(splits[-1, 0]):, :]
+    if last_crop.shape[0] < h:
+        background_color = last_crop[-1, -1]
+        for i in range(h - last_crop.shape[0]):
+            last_crop = np.append(last_crop, [last_crop.shape[1] * list([background_color])], axis=0)
+    else:
+        last_crop = last_crop[:h, :]
+    crop_img.append(last_crop)
     return crop_img
 
 
@@ -93,4 +102,4 @@ def staffDetection(img: np.ndarray, removeLines: bool = True) -> Tuple[List[np.n
     staff_crop = cropImage(img, splittingLines)
     staff_bin_crop = cropImage(lines_removed, splittingLines)
 
-    return staff_crop, staff_bin_crop, lineGap
+    return staff_crop, staff_bin_crop, int(lineGap)
