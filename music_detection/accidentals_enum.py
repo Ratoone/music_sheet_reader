@@ -1,8 +1,7 @@
 from enum import Enum
 
-class NoteEnum(Enum):
-    UNDEFINED = 0
-    FL = 1
-    FS = 2
-    SL = 3
-    SS = 4
+
+class AccidentalsEnum(Enum):
+    NATURAL = 0
+    FLAT = -1
+    SHARP = +1

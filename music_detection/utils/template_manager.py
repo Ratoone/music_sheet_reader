@@ -1,7 +1,9 @@
 import glob
 import os
 
+from music_detection.accidentals_enum import AccidentalsEnum
 from music_detection.key_enum import KeyEnum
+from music_detection.rest_enum import RestsEnum
 from music_detection.time_enum import TimeSignatureEnum
 from music_detection.utils.template import Template
 
@@ -14,13 +16,12 @@ class TemplateManager:
         self.path = path
         self.clef = []
         self.time_signature = []
-        self.__build_clef_template()
-        self.__build_time_template()
         self.rests = []
         self.accidentals = []
-        self.__rests_template()
-        self.__accidentals_template()
-
+        self.__build_clef_template()
+        self.__build_time_template()
+        self.__build_rests_template()
+        self.__build_accidentals_template()
 
     def __build_clef_template(self):
         """
@@ -53,27 +54,24 @@ class TemplateManager:
     def __build_rests_template(self):
         for rests in glob.glob(os.path.join(self.path, "rests/*")):
             if "half_rest_1" in rests:
-                rests_type = RestsEnum.HF
+                rests_type = RestsEnum.HALF
             else:
                 if "whole_rest" in rests:
-                    rests_type = RestsEnum.WR
+                    rests_type = RestsEnum.WHOLE
                 else:
                     if "quarter_rest" in rests:
-                        rests_type = RestsEnum.QR
+                        rests_type = RestsEnum.QUARTER
                     else:
-                        rests_type = RestsEnum.ER
+                        rests_type = RestsEnum.EIGHTH
             self.clef.append(Template(rests, rests_type))
 
     def __build_accidentals_template(self):
         for accidentals in glob.glob(os.path.join(self.path, "accidentals/*")):
-            if "flat-line" in accidentals:
-                accidentals_type = AccidentalsEnum.FL
+            if "flat" in accidentals:
+                accidentals_type = AccidentalsEnum.FLAT
             else:
-                if "flat-space" in accidentals:
-                    accidentals_type = AccidentalsEn.FS
+                if "sharp" in accidentals:
+                    accidentals_type = AccidentalsEnum.SHARP
                 else:
-                    if "sharp-line" in accidentals:
-                        accidentals_type = AccidentalsEnum.SL
-                    else:
-                        accidentals_type = AccidentalsEnum.SS
-            self.clef.append(Template(rests, rests_type))
+                    accidentals_type = AccidentalsEnum.NATURAL
+            self.clef.append(Template(accidentals, accidentals_type))

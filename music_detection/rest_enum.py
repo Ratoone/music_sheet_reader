@@ -1,8 +1,12 @@
 from enum import Enum
 
-class NoteEnum(Enum):
+
+class RestsEnum(Enum):
+    """
+    Enum containing the possible rests. The values represent the duration
+    """
     UNDEFINED = 0
-    HR = 1
-    WR = 2
-    QR = 3
-    ER = 4
+    HALF = 2
+    WHOLE = 4
+    QUARTER = 1
+    EIGHTH = 0.5
