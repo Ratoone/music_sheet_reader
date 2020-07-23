@@ -19,7 +19,7 @@ if __name__ == "__main__":
         staff = Staff(staff_bin_image, line_gap)
         if previous_staff is not None and staff.key in [KeyEnum.UNDEFINED, previous_staff.key]:
             staff.time_signature = previous_staff.time_signature
-        staff.segment_and_divide_staff(staff_image)
+        staff.segment_and_divide_staff(staff_bin_image)
 
         previous_staff = staff
         midi_writer.addStaff(0, staff)

@@ -30,13 +30,13 @@ class ShapeHandler:
         :return: a string denoting the type of element found and an object relevant to that type.
         For instance, a note will return a Note, a clef will return an Enum, etc.
         """
-        clef = pick_template(template_manager.clef, image)
-        if clef is not None:
-            return "clef", clef
-
         time = pick_template(template_manager.time_signature, image)
         if time is not None:
             return "time", time
+
+        clef = pick_template(template_manager.clef, image)
+        if clef is not None:
+            return "clef", clef
 
         rest = pick_template(template_manager.rests, image)
         if rest is not None:

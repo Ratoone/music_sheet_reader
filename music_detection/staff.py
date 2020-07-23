@@ -46,9 +46,9 @@ class Staff:
             xmid_prec = xmid
             prec_index=index+1
 
-            if self.key == KeyEnum.UNDEFINED:
+            if measure.key != KeyEnum.UNDEFINED:
                 self.key = measure.key
-            if self.time_signature == TimeSignatureEnum.UNDEFINED:
+            if measure.time_signature != TimeSignatureEnum.UNDEFINED:
                 self.time_signature = measure.time_signature
 
     def __extract_bar_lines_info(self, stats:np.ndarray) -> np.ndarray :

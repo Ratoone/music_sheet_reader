@@ -80,6 +80,7 @@ def staffDetection(img: np.ndarray, removeLines: bool = True) -> Tuple[List[np.n
     edge_map =generate_edge_map(img)
     im_morph = generate_thresholded_image(img)
     img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    img = 255 - img
 
     staffLines = findLines(edge_map)
     # find number of all the staff lines

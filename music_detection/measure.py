@@ -1,6 +1,7 @@
 import numpy as np
 
 from music_detection.key_enum import KeyEnum
+from music_detection.time_enum import TimeSignatureEnum
 from music_detection.utils.shape_handler import ShapeHandler
 
 
@@ -8,7 +9,7 @@ class Measure:
     def __init__(self, image:np.ndarray=None,elements_info:np.ndarray=np.empty(0), line_gap : int = 0):
         self.position_in_image = []
         self.note_list = []
-        self.time_signature = 0
+        self.time_signature = TimeSignatureEnum.UNDEFINED
         self.line_gap = line_gap
         self.key = KeyEnum.UNDEFINED
         self.image = image #Actual picture of the staff
