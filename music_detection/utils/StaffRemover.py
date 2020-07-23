@@ -88,7 +88,7 @@ def staffDetection(img: np.ndarray, removeLines: bool = True) -> Tuple[List[np.n
     # find number of staves (in twinkle case it is 3)
     numberOfStave = int(numberOfLines / 5)
     # find line Gap
-    lineGap = staffLines[2, 0][0] - staffLines[1, 0][0]
+    lineGap = staffLines[3, 0][0] - staffLines[1, 0][0]
     # make an empty matrix
     splittingLines = np.zeros((numberOfStave, 2))
     # split the title

@@ -22,7 +22,7 @@ class Measure:
 
     def identify_elements(self):
         for element in self.elements_info:
-            element_type, element_value = ShapeHandler.identify_shape(self.image[:, element[0]:element[0]+element[2]], self.key, self.line_gap)
+            element_type, element_value = ShapeHandler.identify_shape(self.image[:, element[0]:element[0]+element[2]], element[1], element[3], self.key, self.line_gap)
             if element_type == "clef":
                 self.key = element_value
             if element_type == "time":
