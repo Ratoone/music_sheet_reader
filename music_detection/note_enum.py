@@ -2,6 +2,7 @@ from enum import Enum
 
 
 class NoteEnum(Enum):
+    REST = -2
     UNDEFINED = -1
     DO = 0
     RE = 1

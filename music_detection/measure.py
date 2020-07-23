@@ -26,5 +26,10 @@ class Measure:
                 self.key = element_value
             if element_type == "time":
                 self.time_signature = element_value
+            if element_type == "rest":
+                self.note_list.append(element_value)
+            if element_type == "accidental":
+                # TODO: handle accidentals
+                pass
             if element_type == "note":
                 self.note_list.append(element_value)

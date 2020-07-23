@@ -6,6 +6,7 @@ import numpy as np
 
 from music_detection.key_enum import KeyEnum
 from music_detection.note import Note
+from music_detection.note_enum import NoteEnum
 from music_detection.utils.template_manager import TemplateManager
 from music_detection.utils.template_matching import pick_template
 
@@ -36,6 +37,14 @@ class ShapeHandler:
         time = pick_template(template_manager.time_signature, image)
         if time is not None:
             return "time", time
+
+        rest = pick_template(template_manager.rests, image)
+        if rest is not None:
+            return "rest", Note(NoteEnum.REST, 0, rest.value)
+
+        accidental = pick_template(template_manager.accidentals, image)
+        if accidental is not None:
+            pass
 
         line_empty_gap = get_adjusted_line_gap(line_gap)
         note_heads = cv2.HoughCircles(image, cv2.HOUGH_GRADIENT, 1.2, line_empty_gap, minRadius=int(0.8*line_empty_gap), maxRadius=int(1.4*line_empty_gap), param1=50, param2=5)

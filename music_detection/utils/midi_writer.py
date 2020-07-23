@@ -36,7 +36,8 @@ class MIDIWriter :
                 file.addTimeSignature(track_id, time,numerator,denominator,clocks_amount)
                 for measure in staff.measure_list :
                     for note in measure.note_list :
-                        file.addNote(track_id,0,self.__pitch_convert(note), time, note.duration,127)
+                        if note.name != NoteEnum.REST:
+                            file.addNote(track_id, 0, self.__pitch_convert(note), time, note.duration, 127)
                         time+= note.duration
 
         with open(file_name,"wb") as output_file :
