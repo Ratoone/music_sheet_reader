@@ -11,21 +11,25 @@ from .utils.template_matching import pick_template
 
 class Staff:
     def __init__(self, image: np.ndarray, line_gap):
+        """
+        Initialize the staff with a binary image and the line gap of the staff
+        :param image:
+        :param line_gap:
+        """
         self.key = KeyEnum.UNDEFINED
         self.time_signature = TimeSignatureEnum.UNDEFINED
         self.measure_list = []
         self.line_gap = line_gap
         self.image = image #Actual picture of the staff
         self.tempo = 120 #overall tempo of the music score in bpm, default MIDI value is 120 bpm
-        self.segment_and_divide_staff(self.image)
 
-    def segment_and_divide_staff(self, staff_bin_img:np.ndarray) -> None:
+    def segment_and_divide_staff(self, staff_img:np.ndarray) -> None:
         """
         Extracts the different elements in the staff image, and splits it into several measures
-         :param staff_bin_img: binary image of the staff, where staff lines have been removed.
+         :param staff_img: binary image of the staff, where staff lines have been removed.
         The notes, accidentals, etc... are expected to be in white.
         """
-        res_array=cv2.connectedComponentsWithStats(staff_bin_img, connectivity=8)
+        res_array=cv2.connectedComponentsWithStats(self.image, connectivity=8)
         stats = res_array[2]
         stats=stats[stats[:,0].argsort()]
         bar_lines_index=self.__extract_bar_lines_info(stats)
@@ -37,7 +41,7 @@ class Staff:
             xmid = int(bar_line_info[0]+bar_line_info[2]/2)
             elements_info = stats[prec_index:index,:]
             elements_info[:,0] -= xmid_prec
-            measure = Measure(self.image[:, xmid_prec:xmid+1], elements_info, self.line_gap)
+            measure = Measure(staff_img[:, xmid_prec:xmid+1], elements_info, self.line_gap)
             self.measure_list.append(measure)
             xmid_prec = xmid
             prec_index=index+1

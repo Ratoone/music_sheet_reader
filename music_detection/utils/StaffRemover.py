@@ -79,6 +79,7 @@ def staffDetection(img: np.ndarray, removeLines: bool = True) -> Tuple[List[np.n
     """
     edge_map =generate_edge_map(img)
     im_morph = generate_thresholded_image(img)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
     staffLines = findLines(edge_map)
     # find number of all the staff lines
@@ -98,8 +99,8 @@ def staffDetection(img: np.ndarray, removeLines: bool = True) -> Tuple[List[np.n
         splittingLines[i + 1][1] = staffLines[s - 1, 0][1]
 
     if removeLines:
-        lines_removed=removeStaff(im_morph, staffLines, numberOfStave)
+        im_morph = removeStaff(im_morph, staffLines, numberOfStave)
     staff_crop = cropImage(img, splittingLines)
-    staff_bin_crop = cropImage(lines_removed, splittingLines)
+    staff_bin_crop = cropImage(im_morph, splittingLines)
 
     return staff_crop, staff_bin_crop, int(lineGap)
