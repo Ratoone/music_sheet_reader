@@ -63,7 +63,7 @@ class TemplateManager:
                         rests_type = RestsEnum.QUARTER
                     else:
                         rests_type = RestsEnum.EIGHTH
-            self.clef.append(Template(rests, rests_type))
+            self.rests.append(Template(rests, rests_type))
 
     def __build_accidentals_template(self):
         for accidentals in glob.glob(os.path.join(self.path, "accidentals/*")):
@@ -74,4 +74,4 @@ class TemplateManager:
                     accidentals_type = AccidentalsEnum.SHARP
                 else:
                     accidentals_type = AccidentalsEnum.NATURAL
-            self.clef.append(Template(accidentals, accidentals_type))
+            self.accidentals.append(Template(accidentals, accidentals_type))
