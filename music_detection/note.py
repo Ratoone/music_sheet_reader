@@ -6,6 +6,7 @@ class Note:
         self.name = name
         self.octave = octave
         self.duration = duration
+        self.accidental = None
 
     @staticmethod
     def from_pitch_duration(pitch: int, duration: float):

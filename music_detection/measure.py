@@ -23,6 +23,8 @@ class Measure:
 
     def identify_elements(self):
         previous_element_type = ""
+        previous_element_value = None
+        previous_element_position = 0
         for element in self.elements_info:
             element_type, element_value = ShapeHandler.identify_shape(self.image[:, element[0]:element[0]+element[2]], element[1], element[3], self.key, self.line_gap)
             if element_type == "clef":
@@ -34,12 +36,13 @@ class Measure:
             if element_type == "accidental":
                 if previous_element_type in ["clef", "accidental"]:
                     self.scale += element_value.value
-                else:
-                    # TODO: handle note accidentals
-                    pass
 
             if element_type == "note":
+                if previous_element_type == "accidental" and element[0] - previous_element_position < self.line_gap:
+                    element_value.accidental = previous_element_value
                 self.note_list.append(element_value)
 
             if element_type != "invalid":
                 previous_element_type = element_type
+                previous_element_value = element_value
+                previous_element_position = element[0]+element[2]
