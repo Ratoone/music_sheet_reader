@@ -1,7 +1,9 @@
 import glob
 import os
 
+from music_detection.accidentals_enum import AccidentalsEnum
 from music_detection.key_enum import KeyEnum
+from music_detection.rest_enum import RestsEnum
 from music_detection.time_enum import TimeSignatureEnum
 from music_detection.utils.template import Template
 
@@ -14,8 +16,12 @@ class TemplateManager:
         self.path = path
         self.clef = []
         self.time_signature = []
+        self.rests = []
+        self.accidentals = []
         self.__build_clef_template()
         self.__build_time_template()
+        self.__build_rests_template()
+        self.__build_accidentals_template()
 
     def __build_clef_template(self):
         """
@@ -44,3 +50,28 @@ class TemplateManager:
             else:
                 time_type = TimeSignatureEnum((int(name[0]), int(name[1])))
             self.time_signature.append(Template(time, time_type))
+
+    def __build_rests_template(self):
+        for rests in glob.glob(os.path.join(self.path, "rests/*")):
+            if "half_rest_1" in rests:
+                rests_type = RestsEnum.HALF
+            else:
+                if "whole_rest" in rests:
+                    rests_type = RestsEnum.WHOLE
+                else:
+                    if "quarter_rest" in rests:
+                        rests_type = RestsEnum.QUARTER
+                    else:
+                        rests_type = RestsEnum.EIGHTH
+            self.rests.append(Template(rests, rests_type))
+
+    def __build_accidentals_template(self):
+        for accidentals in glob.glob(os.path.join(self.path, "accidentals/*")):
+            if "flat" in accidentals:
+                accidentals_type = AccidentalsEnum.FLAT
+            else:
+                if "sharp" in accidentals:
+                    accidentals_type = AccidentalsEnum.SHARP
+                else:
+                    accidentals_type = AccidentalsEnum.NATURAL
+            self.accidentals.append(Template(accidentals, accidentals_type))

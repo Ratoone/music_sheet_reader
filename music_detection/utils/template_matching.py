@@ -12,13 +12,13 @@ MAX_SCALE = 1.5
 SCALE_INCREMENT = 0.05
 
 
-def match(template: np.array, image: np.array) -> Tuple[float, Tuple]:
+def match(template: np.array, image: np.array) -> Tuple[float, Tuple, float]:
     """
     Looks for the template in image and returns the correlation score and position using multi-scale search.
     This assumes the image is rectified beforehand.
     :param template: the template to be found
     :param image: original image
-    :return: tuple representing the correlation value and the position in image of the template found
+    :return: tuple representing the correlation value, the position in image and the scale of the template found
     """
     found = None
 
@@ -36,9 +36,9 @@ def match(template: np.array, image: np.array) -> Tuple[float, Tuple]:
             found = (correlation, max_position, scale)
 
     if not found:
-        return 0, (0, 0)
+        return 0, (0, 0), 0
     (correlation, position, scale) = found
-    return correlation, position
+    return correlation, position, scale
 
 
 def pick_template(template_list: List[Template], image: np.array, threshold=0.6) -> Optional[Enum]:
@@ -53,8 +53,9 @@ def pick_template(template_list: List[Template], image: np.array, threshold=0.6)
     enum_type = 0
 
     for template in template_list:
-        score, _ = match(template.template, image)
-        if score > max_score:
+        score, _, scale = match(template.template, image)
+        # workaround: ignore template matching result if image is too big compared to the template
+        if score > max_score and image.shape[1] < 2.5 * MAX_SCALE * scale * template.template.shape[1]:
             enum_type = template.type
             max_score = score
 
