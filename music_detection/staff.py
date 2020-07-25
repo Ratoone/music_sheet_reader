@@ -17,6 +17,7 @@ class Staff:
         :param line_gap:
         """
         self.key = KeyEnum.UNDEFINED
+        self.scale = 0  # the scale is represented as the number of sharps / flats attached to the key
         self.time_signature = TimeSignatureEnum.UNDEFINED
         self.measure_list = []
         self.line_gap = line_gap
@@ -48,6 +49,7 @@ class Staff:
 
             if measure.key != KeyEnum.UNDEFINED:
                 self.key = measure.key
+                self.scale = measure.scale
             if measure.time_signature != TimeSignatureEnum.UNDEFINED:
                 self.time_signature = measure.time_signature
 
