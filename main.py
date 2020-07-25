@@ -9,7 +9,7 @@ from music_detection.utils.music_score_detector import find_music_score
 
 if __name__ == "__main__":
     logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - [%(name)s] %(levelname)s: %(message)s")
-    image = cv2.imread("resources/test_images/twinkle.jpg")
+    image = cv2.imread("resources/test_images/ode-to-joy.png")
     # music_score = find_music_score(image)
     staves, staves_binary, line_gap = staffDetection(image, True)
     midi_writer = MIDIWriter(1)
