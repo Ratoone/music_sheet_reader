@@ -55,7 +55,7 @@ def pick_template(template_list: List[Template], image: np.array, threshold=0.6)
     for template in template_list:
         score, _, scale = match(template.template, image)
         # workaround: ignore template matching result if image is too big compared to the template
-        if score > max_score and image.shape[1] < 2 * MAX_SCALE * scale * template.template.shape[1]:
+        if score > max_score and image.shape[1] < 2.5 * MAX_SCALE * scale * template.template.shape[1]:
             enum_type = template.type
             max_score = score
 

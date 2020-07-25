@@ -20,12 +20,12 @@ def template_manager():
 
 
 def test_key(template_manager):
-    image = cv2.imread(os.path.join(path, "../resources/test_images/twinkle.jpg"))
+    image = cv2.imread(os.path.join(path, "../resources/test_images/template_test.jpg"))
     image = generate_thresholded_image(image, True)
     assert KeyEnum.SOL == pick_template(template_manager.clef, image)
 
 
 def test_time(template_manager):
-    image = cv2.imread(os.path.join(path, "../resources/test_images/twinkle.jpg"))
+    image = cv2.imread(os.path.join(path, "../resources/test_images/template_test.jpg"))
     image = generate_thresholded_image(image, True)
     assert TimeSignatureEnum.COMMON == pick_template(template_manager.time_signature, image)
