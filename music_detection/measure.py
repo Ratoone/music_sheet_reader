@@ -40,6 +40,7 @@ class Measure:
             if element_type == "note":
                 if previous_element_type == "accidental" and element[0] - previous_element_position < self.line_gap:
                     element_value.accidental = previous_element_value
+                element_value.update_scale(self.scale)
                 self.note_list.append(element_value)
 
             if element_type != "invalid":
