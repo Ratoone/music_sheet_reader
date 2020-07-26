@@ -20,7 +20,7 @@ MAXIMUM_PITCH_DIFFERENCE = 4
 
 
 def get_adjusted_line_gap(line_gap: int) -> int:
-    return int(line_gap * 0.8)
+    return int(line_gap * 0.7)
 
 
 class ShapeHandler:
@@ -61,6 +61,7 @@ class ShapeHandler:
             return "invalid", None
 
         line_empty_gap = get_adjusted_line_gap(line_gap)
+        element_image = cv2.erode(element_image, np.ones((1, 5), np.uint8), iterations=1)
         note_heads = cv2.HoughCircles(element_image, cv2.HOUGH_GRADIENT, 1.2, line_empty_gap, minRadius=int(0.7*line_empty_gap), maxRadius=line_empty_gap, param1=50, param2=5)
         if note_heads is not None:
             # TODO: assuming single note, fix for 2 eights
