@@ -46,10 +46,6 @@ class Measure:
             if element_type == "dot" and previous_element_type == "note":
                 # filter false positives
                 if element[0] > previous_element_h and element[0] - previous_element_h < 2 * self.line_gap:
-                    import cv2
-                    image = cv2.rectangle(self.image, (element[0],element[1]), (element[0]+element[2], element[1]+element[3]), 125, 2)
-                    cv2.imshow("", image)
-                    cv2.waitKey()
                     self.note_list[-1].duration *= 1.5
                 else:
                     element_type = "invalid"
