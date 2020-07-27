@@ -55,10 +55,14 @@ class ShapeHandler:
             return "rest", Note(NoteEnum.REST, 0, rest.value)
 
         # filter out the non-template elements that are far from the staff
-        height, _ = image.shape
+        height, width = image.shape
         theoretical_pitch_distance = (height - 2 * upper_limit - element_height) / line_gap
         if abs(theoretical_pitch_distance) > MAXIMUM_PITCH_DIFFERENCE:
             return "invalid", None
+
+        # dot detection
+        if width < line_gap * 3 / 4:
+            return "dot", None
 
         line_empty_gap = get_adjusted_line_gap(line_gap)
         element_image = cv2.erode(element_image, np.ones((1, 5), np.uint8), iterations=1)
