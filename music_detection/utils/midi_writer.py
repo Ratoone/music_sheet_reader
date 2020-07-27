@@ -64,6 +64,7 @@ class MIDIWriter :
         """
         name = note.name
         octave = note.octave
+        note_offset = 0
         if name == NoteEnum.UNDEFINED :
             raise ValueError("Note name is undefined")
         elif name== NoteEnum.DO :
@@ -80,6 +81,9 @@ class MIDIWriter :
             note_offset = 9
         elif name==NoteEnum.SI :
             note_offset = 11
+
+        if note.accidental is not None:
+            note_offset += note.accidental.value
         
         MIDIValue = (octave+1)*12+note_offset
         return MIDIValue

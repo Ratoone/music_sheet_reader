@@ -12,6 +12,7 @@ class Measure:
         self.time_signature = TimeSignatureEnum.UNDEFINED
         self.line_gap = line_gap
         self.key = KeyEnum.UNDEFINED
+        self.scale = 0
         self.image = image #Actual picture of the staff
 
         #array containing information about the different elements in the measure
@@ -21,6 +22,9 @@ class Measure:
         self.identify_elements()
 
     def identify_elements(self):
+        previous_element_type = ""
+        previous_element_value = None
+        previous_element_position = 0
         for element in self.elements_info:
             element_type, element_value = ShapeHandler.identify_shape(self.image[:, element[0]:element[0]+element[2]], element[1], element[3], self.key, self.line_gap)
             if element_type == "clef":
@@ -30,7 +34,16 @@ class Measure:
             if element_type == "rest":
                 self.note_list.append(element_value)
             if element_type == "accidental":
-                # TODO: handle accidentals
-                pass
+                if previous_element_type in ["clef", "accidental"]:
+                    self.scale += element_value.value
+
             if element_type == "note":
+                if previous_element_type == "accidental" and element[0] - previous_element_position < self.line_gap:
+                    element_value.accidental = previous_element_value
+                element_value.update_scale(self.scale)
                 self.note_list.append(element_value)
+
+            if element_type != "invalid":
+                previous_element_type = element_type
+                previous_element_value = element_value
+                previous_element_position = element[0]+element[2]
