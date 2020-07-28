@@ -16,7 +16,22 @@ class Note:
         :param pitch: pitch measures in notes, e.h. La4 = 7*4+5
         :param duration: the length of the note in number of beats - 1 is a quarter note
         """
-        return Note(NoteEnum(pitch % 7), pitch // 7, duration)
+        if pitch % 7 == 0:
+            name = NoteEnum.DO
+        elif pitch % 7 == 1:
+            name = NoteEnum.RE
+        elif pitch % 7 == 2:
+            name = NoteEnum.MI
+        elif pitch % 7 == 3:
+            name = NoteEnum.FA
+        elif pitch % 7 == 4:
+            name = NoteEnum.SOL
+        elif pitch % 7 == 5:
+            name = NoteEnum.LA
+        else:
+            name = NoteEnum.SI
+
+        return Note(name, pitch // 7, duration)
 
     def update_scale(self, scale: int) -> None:
         """
