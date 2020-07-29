@@ -84,7 +84,7 @@ class ShapeHandler:
                 for note_head in note_heads[0]:
                     not_a_note = False
                     for note_position in note_position_list:
-                        if note_head[0] - note_position < 2 * line_gap:
+                        if abs(note_head[0] - note_position) < 2 * line_gap:
                             not_a_note = True
                     if not_a_note:
                         continue
