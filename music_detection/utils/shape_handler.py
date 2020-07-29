@@ -1,5 +1,6 @@
 import os
-from typing import Tuple
+from enum import Enum
+from typing import Tuple, Union, List, Optional
 
 import cv2
 import numpy as np
@@ -25,7 +26,7 @@ def get_adjusted_line_gap(line_gap: int) -> int:
 
 class ShapeHandler:
     @staticmethod
-    def identify_shape(image: np.ndarray, upper_limit: int, element_height: int, key: KeyEnum, line_gap: int) -> Tuple[str, object]:
+    def identify_shape(image: np.ndarray, upper_limit: int, element_height: int, key: KeyEnum, line_gap: int) -> Tuple[str, Optional[Union[List[Note], Note, Enum]]]:
         """
         Identify the current shape using various methods: template matching, hough transform, etc.
         :param upper_limit: the upper bound of the identified element
@@ -81,12 +82,15 @@ class ShapeHandler:
                 note_list = []
                 note_position_list = []
                 for note_head in note_heads[0]:
+                    not_a_note = False
                     for note_position in note_position_list:
                         if note_head[0] - note_position < 2 * line_gap:
-                            continue
-                        pitch = DEFAULT_NOTE_PITCH + int(np.round((height - 2 * (note_head[1] + upper_limit)) / line_gap))
-                        note_list.append(Note.from_pitch_duration(pitch, 0.5))
-                        note_position_list.append(note_head[0])
+                            not_a_note = True
+                    if not_a_note:
+                        continue
+                    pitch = DEFAULT_NOTE_PITCH + int(np.round((height - 2 * (note_head[1] + upper_limit)) / line_gap))
+                    note_list.append(Note.from_pitch_duration(pitch, 0.5))
+                    note_position_list.append(note_head[0])
 
                 # found some false positives, treat the compound as a single note
                 if len(note_list) == 1:

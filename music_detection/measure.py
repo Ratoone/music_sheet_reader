@@ -43,6 +43,11 @@ class Measure:
                 element_value.update_scale(self.scale)
                 self.note_list.append(element_value)
 
+            if element_type == "notes":
+                for note in element_value:
+                    note.update_scale(self.scale)
+                    self.note_list.append(note)
+
             if element_type == "dot" and previous_element_type == "note":
                 # filter false positives
                 if element[0] > previous_element_h and element[0] - previous_element_h < 2 * self.line_gap:
