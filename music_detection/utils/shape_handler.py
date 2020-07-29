@@ -66,15 +66,38 @@ class ShapeHandler:
 
         line_empty_gap = get_adjusted_line_gap(line_gap)
         element_image = cv2.erode(element_image, np.ones((1, 5), np.uint8), iterations=1)
-        note_heads = cv2.HoughCircles(element_image, cv2.HOUGH_GRADIENT, 1.2, line_empty_gap, minRadius=int(0.7*line_empty_gap), maxRadius=line_empty_gap, param1=50, param2=5)
+        note_heads = cv2.HoughCircles(element_image, cv2.HOUGH_GRADIENT, 1.2, 2 * line_empty_gap, minRadius=int(0.7*line_empty_gap), maxRadius=line_empty_gap, param1=50, param2=5)
         if note_heads is not None:
-            # TODO: assuming single note, fix for 2 eights
-            return "note", ShapeHandler.handle_note(image, key, line_gap, int(note_heads[0][0][0]), int(note_heads[0][0][1]) + upper_limit)
+            if len(note_heads[0]) == 1:
+                if width > 3 * line_gap:
+                    note_height = upper_limit + note_heads[0][0][1]
+                elif note_heads[0][0][1] < element_height / 2:
+                    note_height = upper_limit + line_gap / 2
+                else:
+                    note_height = upper_limit + element_height - line_gap / 2
+                return "note", ShapeHandler.handle_single_note(image, key, line_gap, int(note_heads[0][0][0]), int(note_height))
+            else:
+                # multiple notes, assuming 1/8 notes
+                note_list = []
+                note_position_list = []
+                for note_head in note_heads[0]:
+                    for note_position in note_position_list:
+                        if note_head[0] - note_position < 2 * line_gap:
+                            continue
+                        pitch = DEFAULT_NOTE_PITCH + int(np.round((height - 2 * (note_head[1] + upper_limit)) / line_gap))
+                        note_list.append(Note.from_pitch_duration(pitch, 0.5))
+                        note_position_list.append(note_head[0])
+
+                # found some false positives, treat the compound as a single note
+                if len(note_list) == 1:
+                    return "note", ShapeHandler.handle_single_note(image, key, line_gap, int(note_heads[0][0][0]),
+                                                                   int(note_heads[0][0][1]) + upper_limit)
+                return "notes", [note for _, note in sorted(zip(note_position_list, note_list), key=lambda pair: pair[0])]
 
         return "invalid", None
 
     @staticmethod
-    def handle_note(image: np.ndarray, key: KeyEnum, line_gap: int, note_center_h: int, note_center_v: int) -> Note:
+    def handle_single_note(image: np.ndarray, key: KeyEnum, line_gap: int, note_center_h: int, note_center_v: int) -> Note:
         """
         If the identified object is a note, find its pitch by checking the vertical position in the staff
         :param note_center_h: the horizontal position of the center of the note
