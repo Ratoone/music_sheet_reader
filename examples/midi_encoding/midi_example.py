@@ -12,7 +12,7 @@ from music_detection.note_enum import NoteEnum
 from music_detection.time_enum import TimeSignatureEnum
 
 ##testset creation
-twinkle_staffs = [Staff(None) for i in range(3)]
+twinkle_staffs = [Staff(None, 0) for i in range(3)]
 octave_number = 4
 notes_twinkle = [[NoteEnum.DO, NoteEnum.DO, NoteEnum.SOL, NoteEnum.SOL, NoteEnum.LA, NoteEnum.LA, NoteEnum.SOL, NoteEnum.FA, NoteEnum.FA,
         NoteEnum.MI, NoteEnum.MI, NoteEnum.RE, NoteEnum.RE, NoteEnum.DO],[ NoteEnum.SOL, NoteEnum.SOL, NoteEnum.FA, NoteEnum.FA,

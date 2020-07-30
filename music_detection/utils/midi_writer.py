@@ -4,6 +4,8 @@ from music_detection.time_enum import TimeSignatureEnum
 from music_detection.note_enum import NoteEnum
 
 import midiutil as mu
+import math
+
 
 class MIDIWriter :
     def __init__(self, num_tracks=0) :
@@ -33,7 +35,7 @@ class MIDIWriter :
             for staff in track.staff_list :
                 file.addTempo(track_id,time,staff.tempo)
                 numerator, denominator, clocks_amount = self.__get_time_signature_values(staff.time_signature)
-                file.addTimeSignature(track_id, time,4*numerator,denominator,clocks_amount)
+                file.addTimeSignature(track_id, time,numerator,int(math.log(denominator, 2)),clocks_amount)
                 for measure in staff.measure_list :
                     for note in measure.note_list :
                         if note.name != NoteEnum.REST:

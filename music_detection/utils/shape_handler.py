@@ -1,5 +1,6 @@
 import os
-from typing import Tuple
+from enum import Enum
+from typing import Tuple, Union, List, Optional
 
 import cv2
 import numpy as np
@@ -25,7 +26,7 @@ def get_adjusted_line_gap(line_gap: int) -> int:
 
 class ShapeHandler:
     @staticmethod
-    def identify_shape(image: np.ndarray, upper_limit: int, element_height: int, key: KeyEnum, line_gap: int) -> Tuple[str, object]:
+    def identify_shape(image: np.ndarray, upper_limit: int, element_height: int, key: KeyEnum, line_gap: int) -> Tuple[str, Optional[Union[List[Note], Note, Enum]]]:
         """
         Identify the current shape using various methods: template matching, hough transform, etc.
         :param upper_limit: the upper bound of the identified element
@@ -66,17 +67,44 @@ class ShapeHandler:
 
         line_empty_gap = get_adjusted_line_gap(line_gap)
         element_image = cv2.erode(element_image, np.ones((1, 5), np.uint8), iterations=1)
-        note_heads = cv2.HoughCircles(element_image, cv2.HOUGH_GRADIENT, 1.2, line_empty_gap, minRadius=int(0.7*line_empty_gap), maxRadius=line_empty_gap, param1=50, param2=5)
+        note_heads = cv2.HoughCircles(element_image, cv2.HOUGH_GRADIENT, 1.2, 2 * line_empty_gap, minRadius=int(0.7*line_empty_gap), maxRadius=line_empty_gap, param1=50, param2=5)
         if note_heads is not None:
-            # TODO: assuming single note, fix for 2 eights
-            return "note", ShapeHandler.handle_note(image, key, line_gap, int(note_heads[0][0][0]), int(note_heads[0][0][1]) + upper_limit)
+            if len(note_heads[0]) == 1:
+                if width > 3 * line_gap:
+                    note_height = upper_limit + note_heads[0][0][1]
+                elif note_heads[0][0][1] < element_height / 2:
+                    note_height = upper_limit + line_gap / 2
+                else:
+                    note_height = upper_limit + element_height - line_gap / 2
+                return "note", ShapeHandler.handle_single_note(image, key, line_gap, int(note_heads[0][0][0]), int(note_height), element_height, upper_limit)
+            else:
+                # multiple notes, assuming 1/8 notes
+                note_list = []
+                note_position_list = []
+                for note_head in note_heads[0]:
+                    not_a_note = False
+                    for note_position in note_position_list:
+                        if abs(note_head[0] - note_position) < 2 * line_gap:
+                            not_a_note = True
+                    if not_a_note:
+                        continue
+                    pitch = DEFAULT_NOTE_PITCH + int(np.round((height - 2 * (note_head[1] + upper_limit)) * 0.9 / line_gap))
+                    note_list.append(Note.from_pitch_duration(pitch, 0.5))
+                    note_position_list.append(note_head[0])
+
+                # found some false positives, treat the compound as a single note
+                if len(note_list) == 1:
+                    return "note", ShapeHandler.handle_single_note(image, key, line_gap, int(note_heads[0][0][0]),
+                                                                   int(note_heads[0][0][1]) + upper_limit, element_height, upper_limit)
+                return "notes", [note for _, note in sorted(zip(note_position_list, note_list), key=lambda pair: pair[0])]
 
         return "invalid", None
 
     @staticmethod
-    def handle_note(image: np.ndarray, key: KeyEnum, line_gap: int, note_center_h: int, note_center_v: int) -> Note:
+    def handle_single_note(image: np.ndarray, key: KeyEnum, line_gap: int, note_center_h: int, note_center_v: int, element_height: int, upper_limit: int) -> Note:
         """
         If the identified object is a note, find its pitch by checking the vertical position in the staff
+        :param element_height: the height of the connected component element
         :param note_center_h: the horizontal position of the center of the note
         :param note_center_v: the vertical position of the center of the note
         :param image: the object's cropped image from the music score
@@ -87,9 +115,8 @@ class ShapeHandler:
         # TODO: include the possibility of being in a different scale - assuming Do Major
         # TODO: consider the 1/16th note as well
         height, width = image.shape
-        # no line => full note
-        lines = cv2.HoughLinesP(image, 1, np.pi / 180, int(line_gap * 2.5), minLineLength=int(line_gap * 2.5))
-        if lines is None:
+        # small element => no line, full note
+        if element_height < 3 * line_gap:
             note_duration = 4
         else:
             # center is empty (i.e. average around center is black) => half note
@@ -100,14 +127,16 @@ class ShapeHandler:
                           note_center_h + line_gap//4]) < 0.75 * 255:
                 note_duration = 2
             else:
+                average = np.average(image[upper_limit:upper_limit + element_height, :])
                 # width is no bigger than 2 line gaps (implying the existence of the little flags)
-                if width < 2 * line_gap:
+                if (width < 2 * line_gap and average < 100) or average < 50:
+                    # print(np.average(image[upper_limit:upper_limit + element_height, :]))
                     note_duration = 1
                 else:
                     note_duration = 0.5
 
         # count the increments of half line gap between the note and the third line
-        note_pitch = DEFAULT_NOTE_PITCH + int(np.round((height - 2 * note_center_v) / line_gap))
+        note_pitch = DEFAULT_NOTE_PITCH + int(np.round((height - 2 * note_center_v) * 0.97 / line_gap))
         # adapt the note to the key
         if key == KeyEnum.FA:
             note_pitch -= 12

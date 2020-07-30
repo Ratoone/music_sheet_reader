@@ -43,14 +43,18 @@ class Staff:
             elements_info = stats[prec_index:index,:]
             elements_info[:,0] -= xmid_prec
             measure = Measure(staff_img[:, xmid_prec:xmid+1], elements_info, self.line_gap)
+            if self.key != KeyEnum.UNDEFINED:
+                measure.key = self.key
+                measure.scale = self.scale
+                measure.time_signature = self.time_signature
+            measure.identify_elements()
             self.measure_list.append(measure)
             xmid_prec = xmid
             prec_index=index+1
 
-            if measure.key != KeyEnum.UNDEFINED:
+            if self.key == KeyEnum.UNDEFINED and measure.key != KeyEnum.UNDEFINED:
                 self.key = measure.key
                 self.scale = measure.scale
-            if measure.time_signature != TimeSignatureEnum.UNDEFINED:
                 self.time_signature = measure.time_signature
 
     def __extract_bar_lines_info(self, stats:np.ndarray) -> np.ndarray :
@@ -61,5 +65,5 @@ class Staff:
          :return: np.ndarray, contains the indexes of the bar lines information in stats
         """
         ratio = stats[:,3]/stats[:,2]
-        bar_lines_index = np.where(ratio >8.0)[0]
+        bar_lines_index = np.where(ratio > 10.0)[0]
         return bar_lines_index
