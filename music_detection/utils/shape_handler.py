@@ -76,7 +76,7 @@ class ShapeHandler:
                     note_height = upper_limit + line_gap / 2
                 else:
                     note_height = upper_limit + element_height - line_gap / 2
-                return "note", ShapeHandler.handle_single_note(image, key, line_gap, int(note_heads[0][0][0]), int(note_height), element_height)
+                return "note", ShapeHandler.handle_single_note(image, key, line_gap, int(note_heads[0][0][0]), int(note_height), element_height, upper_limit)
             else:
                 # multiple notes, assuming 1/8 notes
                 note_list = []
@@ -88,20 +88,20 @@ class ShapeHandler:
                             not_a_note = True
                     if not_a_note:
                         continue
-                    pitch = DEFAULT_NOTE_PITCH + int(np.round((height - 2 * (note_head[1] + upper_limit)) / line_gap))
+                    pitch = DEFAULT_NOTE_PITCH + int(np.round((height - 2 * (note_head[1] + upper_limit)) * 0.9 / line_gap))
                     note_list.append(Note.from_pitch_duration(pitch, 0.5))
                     note_position_list.append(note_head[0])
 
                 # found some false positives, treat the compound as a single note
                 if len(note_list) == 1:
                     return "note", ShapeHandler.handle_single_note(image, key, line_gap, int(note_heads[0][0][0]),
-                                                                   int(note_heads[0][0][1]) + upper_limit, element_height)
+                                                                   int(note_heads[0][0][1]) + upper_limit, element_height, upper_limit)
                 return "notes", [note for _, note in sorted(zip(note_position_list, note_list), key=lambda pair: pair[0])]
 
         return "invalid", None
 
     @staticmethod
-    def handle_single_note(image: np.ndarray, key: KeyEnum, line_gap: int, note_center_h: int, note_center_v: int, element_height: int) -> Note:
+    def handle_single_note(image: np.ndarray, key: KeyEnum, line_gap: int, note_center_h: int, note_center_v: int, element_height: int, upper_limit: int) -> Note:
         """
         If the identified object is a note, find its pitch by checking the vertical position in the staff
         :param element_height: the height of the connected component element
@@ -127,14 +127,16 @@ class ShapeHandler:
                           note_center_h + line_gap//4]) < 0.75 * 255:
                 note_duration = 2
             else:
+                average = np.average(image[upper_limit:upper_limit + element_height, :])
                 # width is no bigger than 2 line gaps (implying the existence of the little flags)
-                if width < 2 * line_gap:
+                if (width < 2 * line_gap and average < 100) or average < 50:
+                    # print(np.average(image[upper_limit:upper_limit + element_height, :]))
                     note_duration = 1
                 else:
                     note_duration = 0.5
 
         # count the increments of half line gap between the note and the third line
-        note_pitch = DEFAULT_NOTE_PITCH + int(np.round((height - 2 * note_center_v) / line_gap))
+        note_pitch = DEFAULT_NOTE_PITCH + int(np.round((height - 2 * note_center_v) * 0.97 / line_gap))
         # adapt the note to the key
         if key == KeyEnum.FA:
             note_pitch -= 12
