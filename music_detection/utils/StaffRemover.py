@@ -61,8 +61,8 @@ def removeStaff(binarized_music_score: np.ndarray, staff_lines:np.ndarray, numbe
             upper_lim=int(staff_lines[staff_number*10+i+1,0,0]+1)
             for col in range(width) :
                 if (binarized_music_score[lower_lim-1, col]==0) and (binarized_music_score[upper_lim+1,col]==0) :
-                    staff_lines_erased[lower_lim:upper_lim+1, col]=0
-    
+                    staff_lines_erased[lower_lim:upper_lim, col]=0
+
     #Closing operation
     kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (3, 3))
     staff_lines_erased = cv2.morphologyEx(staff_lines_erased, cv2.MORPH_CLOSE, kernel)  

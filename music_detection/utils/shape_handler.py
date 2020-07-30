@@ -76,7 +76,7 @@ class ShapeHandler:
                     note_height = upper_limit + line_gap / 2
                 else:
                     note_height = upper_limit + element_height - line_gap / 2
-                return "note", ShapeHandler.handle_single_note(image, key, line_gap, int(note_heads[0][0][0]), int(note_height))
+                return "note", ShapeHandler.handle_single_note(image, key, line_gap, int(note_heads[0][0][0]), int(note_height), element_height)
             else:
                 # multiple notes, assuming 1/8 notes
                 note_list = []
@@ -95,15 +95,16 @@ class ShapeHandler:
                 # found some false positives, treat the compound as a single note
                 if len(note_list) == 1:
                     return "note", ShapeHandler.handle_single_note(image, key, line_gap, int(note_heads[0][0][0]),
-                                                                   int(note_heads[0][0][1]) + upper_limit)
+                                                                   int(note_heads[0][0][1]) + upper_limit, element_height)
                 return "notes", [note for _, note in sorted(zip(note_position_list, note_list), key=lambda pair: pair[0])]
 
         return "invalid", None
 
     @staticmethod
-    def handle_single_note(image: np.ndarray, key: KeyEnum, line_gap: int, note_center_h: int, note_center_v: int) -> Note:
+    def handle_single_note(image: np.ndarray, key: KeyEnum, line_gap: int, note_center_h: int, note_center_v: int, element_height: int) -> Note:
         """
         If the identified object is a note, find its pitch by checking the vertical position in the staff
+        :param element_height: the height of the connected component element
         :param note_center_h: the horizontal position of the center of the note
         :param note_center_v: the vertical position of the center of the note
         :param image: the object's cropped image from the music score
@@ -114,9 +115,8 @@ class ShapeHandler:
         # TODO: include the possibility of being in a different scale - assuming Do Major
         # TODO: consider the 1/16th note as well
         height, width = image.shape
-        # no line => full note
-        lines = cv2.HoughLinesP(image, 1, np.pi / 180, int(line_gap * 2.5), minLineLength=int(line_gap * 2.5))
-        if lines is None:
+        # small element => no line, full note
+        if element_height < 3 * line_gap:
             note_duration = 4
         else:
             # center is empty (i.e. average around center is black) => half note

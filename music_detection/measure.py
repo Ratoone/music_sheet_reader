@@ -19,7 +19,6 @@ class Measure:
         #these information are stored in the following order :
         #[x_upper_left_corner, y_upper_left_corner, width, height,_]
         self.elements_info=elements_info
-        self.identify_elements()
 
     def identify_elements(self):
         previous_element_type = ""
@@ -34,7 +33,7 @@ class Measure:
             if element_type == "rest":
                 self.note_list.append(element_value)
             if element_type == "accidental":
-                if previous_element_type in ["clef", "accidental"]:
+                if previous_element_type in ["clef", "accidental"] and self.time_signature == TimeSignatureEnum.UNDEFINED:
                     self.scale += element_value.value
 
             if element_type == "note":
